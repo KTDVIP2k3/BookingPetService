@@ -1,6 +1,7 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,11 +33,11 @@ public class Pet extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonIgnore // Ngăn vòng lặp khi serialize JSON
     private User user;
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore // Ngăn vòng lặp khi serialize JSON
     private List<Booking> bookingList;
 
     public String getPetName() {

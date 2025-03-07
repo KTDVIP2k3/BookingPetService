@@ -1,6 +1,8 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +19,6 @@ public class Role extends BaseEntity{
     private RoleEnum roleName;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonIgnore // Ngăn vòng lặp khi serialize JSON
     private List<User> userList;
 }
