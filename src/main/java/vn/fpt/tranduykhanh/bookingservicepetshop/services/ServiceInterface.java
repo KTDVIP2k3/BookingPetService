@@ -7,9 +7,9 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import java.security.Provider;
 
 public interface ServiceInterface {
-    public ResponseEntity<ResponseObj> getServiceAll();
+    public ResponseEntity<ResponseObj> getServiceAllIsActive();
 
-    public ResponseEntity<ResponseObj> getServiceById(Long id);
+    public ResponseEntity<ResponseObj> getServiceByIdIsActive(Long id);
 
     public ResponseEntity<ResponseObj> createService(ServiceDTO serviceDTO);
 

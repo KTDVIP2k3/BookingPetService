@@ -25,8 +25,6 @@ public class Pet extends BaseEntity{
 
     private int Age;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String imagePetBase64;
 
     private String notes;

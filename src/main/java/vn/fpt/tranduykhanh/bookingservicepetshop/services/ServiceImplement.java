@@ -5,9 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetService;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.ServiceResponse;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.utils.FileUtils;
 
 import java.io.File;
@@ -21,27 +24,35 @@ import java.util.Optional;
 public class ServiceImplement implements ServiceInterface{
     @Autowired
     private ServiceRepository serviceRepository;
+
+    @Autowired
+    private UploadImageFileService uploadImageFileService;
+
     @Override
-    public ResponseEntity<ResponseObj> getServiceAll() {
-        List<PetService> serviceList = new ArrayList<>();
-        serviceList = serviceRepository.findAll();
-        ResponseObj responseObj = new ResponseObj(HttpStatus.OK.toString(),
-                "Danh sách dịch vụ dành cho pet",
-                serviceList);
-        if(serviceList.isEmpty()){
-            responseObj.setMessage("Danh sách dịch vụ dành cho pet đang trống");
-            return ResponseEntity.status(HttpStatus.OK).body(responseObj);
+    public ResponseEntity<ResponseObj> getServiceAllIsActive() {
+        try{
+            List<ServiceResponse> serviceResponses = new ArrayList<>();
+            if(serviceRepository.findAll().isEmpty()){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "List is empty", serviceRepository.findAll()));
+            }
+            for(PetService service : serviceRepository.findAll()){
+                if(service.isActive()){
+                    serviceResponses.add(new ServiceResponse(service.getServiceName(), service.getDescription(), service.getPrice(), service.getImageServiceBase64(), service.isActive()));
+                }
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "List of Service", serviceResponses));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Found!!!", e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(responseObj);
     }
 
     @Override
-    public ResponseEntity<ResponseObj> getServiceById(Long id) {
+    public ResponseEntity<ResponseObj> getServiceByIdIsActive(Long id) {
         Optional<PetService> service = serviceRepository.findById(id);
-        if(service != null){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "OK", service));
+        if(service != null && service.get().isActive()){
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "OK", convertServiceToServiceResponseById(id)));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Service này không tồn tại", service));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Service này không tồn tại", null));
     }
 
     @Override
@@ -51,18 +62,7 @@ public class ServiceImplement implements ServiceInterface{
             service.setServiceName(serviceDTO.getServiceName()); // Lấy từ DTO
             service.setDescription(serviceDTO.getServiceDescription()); // Lấy từ DTO
             service.setPrice(serviceDTO.getServicePrice()); // Lấy từ DTO
-
-            try {
-                String base64Image = (serviceDTO.getImageService() != null && !serviceDTO.getImageService().isEmpty())
-                        ? FileUtils.convertToBase64(serviceDTO.getImageService())
-                        : null;
-
-                service.setImageServiceBase64(base64Image);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Lỗi chuyển đổi ảnh", null));
-            }
-
+            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
             service.setCreateAt(LocalDateTime.now());
             service.setActive(true);
             serviceRepository.save(service);
@@ -82,26 +82,27 @@ public class ServiceImplement implements ServiceInterface{
         if (!existingServiceOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(),"Not found", null));
         }
+        try{
 
-        PetService existingService = existingServiceOpt.get();
-        existingService.setServiceName(serviceDTO.getServiceName());
-        existingService.setDescription(serviceDTO.getServiceDescription());
-        existingService.setPrice(serviceDTO.getServicePrice());
-
-        try {
-            String base64Image = (serviceDTO.getImageService() != null && !serviceDTO.getImageService().isEmpty())
-                    ? FileUtils.convertToBase64(serviceDTO.getImageService())
-                    : null;
-
-            existingService.setImageServiceBase64(base64Image);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Lỗi chuyển đổi ảnh", null));
+            PetService existingService = existingServiceOpt.get();
+            existingService.setServiceName(serviceDTO.getServiceName());
+            existingService.setDescription(serviceDTO.getServiceDescription());
+            existingService.setPrice(serviceDTO.getServicePrice());
+            existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
+            serviceRepository.save(existingService);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", convertServiceToServiceResponseById(id)));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(),null));
         }
+    }
 
-        serviceRepository.save(existingService);
-
-        return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", existingService));
+    public ServiceResponse convertServiceToServiceResponseById(Long id){
+        Optional<PetService> service = serviceRepository.findById(id);
+        if(!service.isPresent()){
+            return null;
+        }
+        ServiceResponse serviceResponse = new ServiceResponse(service.get().getServiceName(), service.get().getDescription(),service.get().getPrice(), service.get().getImageServiceBase64(), service.get().isActive());
+        return  serviceResponse;
     }
 
     @Override
@@ -112,7 +113,9 @@ public class ServiceImplement implements ServiceInterface{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(),"Service not found", null));
         }
 
-        serviceRepository.deleteById(id);
+        serviceRepository.delete(serviceOpt.get());
+//        serviceOpt.get().setActive(false);
+//        serviceRepository.save(serviceOpt.get());
         return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),"Service deleted successfully", null));
     }
 }

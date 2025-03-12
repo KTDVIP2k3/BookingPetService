@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -32,8 +33,9 @@ public class User extends BaseEntity implements UserDetails {
 
     private String address;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+//    @Lob
+//    @Column(columnDefinition = "TEXT")
+//    @JsonIgnore
     private String avatarBase64;
 
 
@@ -76,7 +78,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
     }
 
 

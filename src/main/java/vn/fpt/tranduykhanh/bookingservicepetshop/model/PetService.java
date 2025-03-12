@@ -20,8 +20,6 @@ public class PetService extends BaseEntity{
 
     private double price;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String imageServiceBase64;
 
     private final int maxSlot = 20;
@@ -81,6 +79,7 @@ public class PetService extends BaseEntity{
     public void setImageServiceBase64(String imageServiceBase64) {
         this.imageServiceBase64 = imageServiceBase64;
     }
+
 
     public int getMaxSlot() {
         return maxSlot;

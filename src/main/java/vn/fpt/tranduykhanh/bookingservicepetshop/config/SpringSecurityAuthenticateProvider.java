@@ -19,20 +19,22 @@ public class SpringSecurityAuthenticateProvider {
     @Autowired
     UserDetailsService userDetailsService;
 
+
     @Autowired
     @Lazy
     PasswordEncoder passwordEncoder;
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+//        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);  // Cần bảo đảm PasswordEncoder được cấu hình đúng
+        daoAuthenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        return  daoAuthenticationProvider;
+        return daoAuthenticationProvider;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder(12);
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);  // Dùng BCryptPasswordEncoder
     }
 }

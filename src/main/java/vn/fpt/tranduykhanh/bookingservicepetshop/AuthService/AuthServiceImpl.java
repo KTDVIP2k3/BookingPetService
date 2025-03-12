@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,8 +19,10 @@ public class AuthServiceImpl implements AuthServiceInterface{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(userRepository.findByUserName(username) == null){
+
+        }
+        User user = userRepository.findByUserName(username);
         return user;
     }
 }
