@@ -7,4 +7,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
+    Pet findByPetName(String petName);
+
+    boolean existsByPetName(String petName);
 }

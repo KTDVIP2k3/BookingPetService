@@ -88,6 +88,7 @@ public class ServiceImplement implements ServiceInterface{
             existingService.setServiceName(serviceDTO.getServiceName());
             existingService.setDescription(serviceDTO.getServiceDescription());
             existingService.setPrice(serviceDTO.getServicePrice());
+            existingService.setUpdateAt(LocalDateTime.now());
             existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
             serviceRepository.save(existingService);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", convertServiceToServiceResponseById(id)));

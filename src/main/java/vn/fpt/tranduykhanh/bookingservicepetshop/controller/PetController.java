@@ -1,10 +1,13 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.controller;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.PetDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.PetService;
 
@@ -14,28 +17,28 @@ public class PetController {
     @Autowired
     private PetService petService;
 
-    @PostMapping
-    public ResponseEntity<ResponseObj> createPet(@RequestBody Pet pet, @RequestParam Long userId) {
-        return petService.createPet(pet, userId);
+    @PostMapping(value = "/v1/createPet", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseObj> createPet(@ModelAttribute PetDTO petDTO, HttpServletRequest request) {
+       return petService.createPet(petDTO,request);
     }
 
-    @GetMapping
-    public ResponseEntity<ResponseObj> getAllPets() {
-        return petService.getAllPets();
+    @GetMapping("/v1/getPetListOfUser")
+    public ResponseEntity<ResponseObj> getAllPetsOfUser(HttpServletRequest request) {
+        return petService.getAllPetsByUser(request);
     }
 
-    @GetMapping("/{petId}")
-    public ResponseEntity<ResponseObj> getPetById(@PathVariable Long petId) {
-        return petService.getPetById(petId);
+    @GetMapping("/getPetByIdOfUser/{petId}")
+    public ResponseEntity<ResponseObj> getPetById(@PathVariable Long petId, HttpServletRequest request) {
+        return petService.getPetById(petId ,request);
     }
 
-    @PutMapping("/{petId}")
-    public ResponseEntity<ResponseObj> updatePet(@PathVariable Long petId, @RequestBody Pet pet) {
-        return petService.updatePet(petId, pet);
+    @PutMapping(value = "/v1/updatePet/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseObj> updatePet(@PathVariable Long petId, @ModelAttribute PetDTO petDTO, HttpServletRequest request) {
+        return petService.updatePetByUser(petId,petDTO,request);
     }
 
-    @DeleteMapping("/{petId}")
-    public ResponseEntity<ResponseObj> deletePet(@PathVariable Long petId) {
-        return petService.deletePet(petId);
+    @DeleteMapping("/deletPetOfUserById/{petId}")
+    public ResponseEntity<ResponseObj> deletePet(@PathVariable Long petId, HttpServletRequest request) {
+        return petService.deletePetByUser(petId, request);
     }
 }

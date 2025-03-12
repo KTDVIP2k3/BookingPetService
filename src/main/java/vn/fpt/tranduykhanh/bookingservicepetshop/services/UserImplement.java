@@ -114,7 +114,7 @@ public class UserImplement implements UserInterface {
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
             user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile())); // Sửa lỗi avatar lấy từ DTO
-            user.setRole(roleRepository.findByRoleName(RoleEnum.ADMIN));
+            user.setRole(roleRepository.findByRoleName(RoleEnum.CUSTOMER));
             user.setActive(true);
             user.setCreateAt(LocalDateTime.now());
 
