@@ -12,6 +12,8 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetTypeEnum;
 @Getter
 @Setter
 public class PetReponse {
+    private long petId;
+
     private String petName;
 
     private PetTypeEnum petTypeEnum;

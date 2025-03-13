@@ -38,7 +38,7 @@ public class Booking extends BaseEntity{
 //    @JsonIgnore  // Ngăn vòng lặp khi serialize JSON
     private PetService service;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
 }

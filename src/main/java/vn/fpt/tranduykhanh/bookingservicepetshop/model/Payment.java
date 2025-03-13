@@ -1,6 +1,7 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -17,9 +18,9 @@ import java.util.List;
 public class Payment extends BaseEntity{
     private PaymentMethodEnum paymentMethodName;
 
-    @OneToOne(mappedBy = "payment")
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Booking booking;
+    private List<Booking> bookingList;
 
     @OneToMany(mappedBy = "payment")
     @JsonIgnore

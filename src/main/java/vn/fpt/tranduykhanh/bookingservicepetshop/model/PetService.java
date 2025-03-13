@@ -1,5 +1,6 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +26,7 @@ public class PetService extends BaseEntity{
     private final int maxSlot = 20;
 
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Booking> bookingList;
 
     public String getServiceName() {

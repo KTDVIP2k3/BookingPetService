@@ -4,24 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.ServiceInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetService;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ServiceResponse;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
-import vn.fpt.tranduykhanh.bookingservicepetshop.utils.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ServiceImplement implements ServiceInterface{
+public class ServiceImplement implements ServiceInterface {
     @Autowired
     private ServiceRepository serviceRepository;
 
@@ -37,7 +33,7 @@ public class ServiceImplement implements ServiceInterface{
             }
             for(PetService service : serviceRepository.findAll()){
                 if(service.isActive()){
-                    serviceResponses.add(new ServiceResponse(service.getServiceName(), service.getDescription(), service.getPrice(), service.getImageServiceBase64(), service.isActive()));
+                    serviceResponses.add(new ServiceResponse(service.getId(),service.getServiceName(), service.getDescription(), service.getPrice(), service.getImageServiceBase64(), service.isActive()));
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "List of Service", serviceResponses));
@@ -102,7 +98,7 @@ public class ServiceImplement implements ServiceInterface{
         if(!service.isPresent()){
             return null;
         }
-        ServiceResponse serviceResponse = new ServiceResponse(service.get().getServiceName(), service.get().getDescription(),service.get().getPrice(), service.get().getImageServiceBase64(), service.get().isActive());
+        ServiceResponse serviceResponse = new ServiceResponse(service.get().getId(),service.get().getServiceName(), service.get().getDescription(),service.get().getPrice(), service.get().getImageServiceBase64(), service.get().isActive());
         return  serviceResponse;
     }
 

@@ -5,19 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.AuthService.JWTService;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.Role;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.UserInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.RoleEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.RoleRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.UserRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
-import vn.fpt.tranduykhanh.bookingservicepetshop.request.RoleDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
@@ -25,7 +25,6 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserImplement implements UserInterface {
@@ -131,13 +130,17 @@ public class UserImplement implements UserInterface {
     public UserResponse convertUserToUserResponse(User user){
         if(user == null)
             return null;
-        UserResponse userResponse = new UserResponse(user.getUserName(),user.getEmail(),user.getPhone(),user.getAddress(),user.getAvatarBase64());
+        UserResponse userResponse = new UserResponse(user.getId(),user.getUserName(),user.getEmail(),user.getPhone(),user.getAddress(),user.getAvatarBase64());
         return userResponse;
     }
 
     @Override
     public ResponseEntity<ResponseObj> loginByUserName(LoginUserDTO loginUserDTO) {
         try {
+            if(!userRepository.existsByUserName(loginUserDTO.getUserName())){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ResponseObj(HttpStatus.UNAUTHORIZED.toString(), "Login failed: Username not found", null));
+            }
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginUserDTO.getUserName(), loginUserDTO.getPassword())
             );
@@ -150,6 +153,9 @@ public class UserImplement implements UserInterface {
                 return ResponseEntity.status(HttpStatus.OK)
                         .body(new ResponseObj(HttpStatus.OK.toString(), "Login successful", token));
             }
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseObj(HttpStatus.UNAUTHORIZED.toString(), "Login failed: Incorrect password", null));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ResponseObj(HttpStatus.UNAUTHORIZED.toString(), "Login failed: " + e.getMessage(), null));

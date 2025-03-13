@@ -4,8 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PetService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PetRepository;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PetServiceImpl implements PetService{
+public class PetServiceImpl implements PetService {
     @Autowired
     private PetRepository petRepository;
 
@@ -64,12 +64,15 @@ public class PetServiceImpl implements PetService{
     private PetReponse convertPetToPetReponse(Pet pet){
         if(petRepository.findByPetName(pet.getPetName()) == null )
             return null;
-        return new PetReponse(pet.getPetName(),pet.getPetType(), pet.getPetGender(), pet.getAge(), pet.getImagePetBase64(), pet.getNotes());
+        return new PetReponse(pet.getId(),pet.getPetName(),pet.getPetType(), pet.getPetGender(), pet.getAge(), pet.getImagePetBase64(), pet.getNotes());
     }
 
     @Override
     public ResponseEntity<ResponseObj> getAllPetsByUser(HttpServletRequest request) {
         try{
+            if(userImplement.getUserByToken(request) == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co tai khoan nay de so huu pet", null));
+            }
             User user = userImplement.getUserByToken(request);
             List<Pet> pets = user.getPetList();
             if (pets.isEmpty()){

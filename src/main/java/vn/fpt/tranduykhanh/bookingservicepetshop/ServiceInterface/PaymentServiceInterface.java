@@ -1,4 +1,4 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.services;
+package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import org.springframework.http.ResponseEntity;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PaymentDTO;

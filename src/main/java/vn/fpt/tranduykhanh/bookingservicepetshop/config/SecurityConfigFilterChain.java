@@ -41,7 +41,8 @@
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
             CorsConfiguration configuration = new CorsConfiguration();
-            configuration.addAllowedOrigin("http://localhost:5173"); // Cho phép frontend trên localhost:5173
+            configuration.addAllowedOrigin("http://localhost:5173");
+            configuration.addAllowedOrigin("https://exe-201-web.vercel.app");// Cho phép frontend trên localhost:5173
             configuration.addAllowedMethod("*"); // Cho phép tất cả phương thức HTTP (GET, POST, PUT, DELETE, ...)
             configuration.addAllowedHeader("*"); // Cho phép tất cả header (content-type, authorization, ...)
 

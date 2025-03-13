@@ -7,14 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.UpLoadImageFileInterface;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -23,7 +21,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UploadImageFileService implements UpLoadImageFileInterface{
+public class UploadImageFileService implements UpLoadImageFileInterface {
     private final Cloudinary cloudinary;
 
 //    public String updateImage(MultipartFile file, String oldPublicId) throws IOException {

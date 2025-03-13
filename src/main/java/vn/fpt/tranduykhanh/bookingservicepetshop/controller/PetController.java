@@ -1,15 +1,13 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.controller;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PetDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
-import vn.fpt.tranduykhanh.bookingservicepetshop.services.PetService;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PetService;
 
 @RestController
 @RequestMapping("/api/pets")

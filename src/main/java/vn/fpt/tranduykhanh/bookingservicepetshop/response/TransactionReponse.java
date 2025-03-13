@@ -1,22 +1,16 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.model;
+package vn.fpt.tranduykhanh.bookingservicepetshop.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Transaction extends BaseEntity {
-
-    @ManyToOne
-    @JoinColumn(name = "payment_id", nullable = false)
-    private Payment payment;
+@AllArgsConstructor
+@Data
+public class TransactionReponse {
+    private String reference;
 
     private int amount;
 

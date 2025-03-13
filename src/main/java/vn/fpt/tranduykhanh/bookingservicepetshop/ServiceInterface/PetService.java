@@ -1,8 +1,7 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.services;
+package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PetDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 

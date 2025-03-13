@@ -1,10 +1,8 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.services;
+package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import org.springframework.http.ResponseEntity;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
-
-import java.security.Provider;
 
 public interface ServiceInterface {
     public ResponseEntity<ResponseObj> getServiceAllIsActive();

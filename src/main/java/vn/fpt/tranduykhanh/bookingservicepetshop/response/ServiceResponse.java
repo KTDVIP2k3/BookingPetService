@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceResponse {
+    private long serviceId;
+
     private String serviceName;
 
     private String description;

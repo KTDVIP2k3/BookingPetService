@@ -2,19 +2,18 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.BookingInterfaceService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Role;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.RoleRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.RoleDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
-public class RoleImplement implements RoleInterface {
+public class RoleImplement implements BookingInterfaceService.RoleInterface {
 
     @Autowired
     RoleRepository roleRepository;

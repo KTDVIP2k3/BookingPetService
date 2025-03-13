@@ -2,9 +2,9 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PaymentServiceInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Payment;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PaymentDTO;
