@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -18,6 +20,8 @@ public class Booking extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     private BookingStatusPaid bookingStatusPaid;
+
+    private LocalDate localDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

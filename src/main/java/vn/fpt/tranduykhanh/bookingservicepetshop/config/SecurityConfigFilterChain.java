@@ -45,6 +45,8 @@
             configuration.addAllowedMethod("*"); // Cho phép tất cả phương thức HTTP (GET, POST, PUT, DELETE, ...)
             configuration.addAllowedHeader("*"); // Cho phép tất cả header (content-type, authorization, ...)
 
+            configuration.setAllowCredentials(true);
+
             // Nếu backend của bạn sử dụng cookie hay xác thực session, bạn có thể cần bật thêm những tùy chọn dưới đây:
             // configuration.setAllowCredentials(true);
 
