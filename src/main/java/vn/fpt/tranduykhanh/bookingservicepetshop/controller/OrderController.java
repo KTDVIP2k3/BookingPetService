@@ -15,10 +15,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.BookingRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.CreatePaymentLinkRequestBody;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PaymentLinkDataDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.TransactionDTO;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.CheckOutReponse;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.OrderReponse;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.TransactionReponse;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.BookingImplServce;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.PaymentLinkDataServiceIpml;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.TransactionServiceImple;
@@ -128,7 +125,7 @@ public class OrderController {
 
             try {
                 CheckoutResponseData data = payos.createPaymentLink(paymentData);
-                checkOutReponse.setBooking(booking);
+                checkOutReponse.setBookingReponse(bookingImplServce.convertoBookingReponse(booking));
                 checkOutReponse.setCheckOutUrl(data.getCheckoutUrl());
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Check out", checkOutReponse));
             } catch (Exception e) {
@@ -200,7 +197,9 @@ public class OrderController {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
        }
 
-       orderReponse.setBooking(booking);
+        BookingReponse bookingReponse = bookingImplServce.convertoBookingReponse(booking);
+
+       orderReponse.setBookingReponse(bookingReponse);
        orderReponse.setPaymentLinkData(paymentLinkData);
 
         // Cập nhật trạng thái booking dựa trên status nhận được từ PayOS
@@ -287,7 +286,9 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
         }
 
-        orderReponse.setBooking(booking);
+        BookingReponse bookingReponse = bookingImplServce.convertoBookingReponse(booking);
+
+        orderReponse.setBookingReponse(bookingReponse);
         orderReponse.setPaymentLinkData(paymentLinkData);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Order: ", orderReponse));

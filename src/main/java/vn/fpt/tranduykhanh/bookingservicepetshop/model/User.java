@@ -39,12 +39,12 @@ public class User extends BaseEntity implements UserDetails {
     private String avatarBase64;
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore  // Tránh vòng lặp khi serialize JSON
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+     // Tránh vòng lặp khi serialize JSON
     private List<Pet> petList;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore  // Tránh vòng lặp khi serialize JSON
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    // Tránh vòng lặp khi serialize JSON
     private List<Booking> bookingList;
 
     @ManyToOne

@@ -11,7 +11,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 
 public class CheckOutReponse {
 
-    private Booking booking;
+    private BookingReponse bookingReponse;
 
     private String checkOutUrl;
 }

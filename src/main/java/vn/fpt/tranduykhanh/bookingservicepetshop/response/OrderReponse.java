@@ -10,7 +10,7 @@ import vn.payos.type.PaymentLinkData;
 @AllArgsConstructor
 @Data
 public class OrderReponse {
-    private Booking booking;
+    private BookingReponse bookingReponse;
 
     private PaymentLinkData paymentLinkData;
 }

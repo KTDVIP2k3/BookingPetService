@@ -124,7 +124,9 @@ public class BookingImplServce implements BookingInterfaceService {
           }
           List<BookingReponse> bookingReponseList = new ArrayList<>();
 
-          List<Booking> bookingList = userImplement.getUserByToken(request).getBookingList();
+          User user = userImplement.getUserByToken(request);
+
+          List<Booking> bookingList = user.getBookingList();
 
           for(Booking booking : bookingList){
               bookingReponseList.add(convertoBookingReponse(booking));
@@ -140,9 +142,6 @@ public class BookingImplServce implements BookingInterfaceService {
     }
 
     public Booking getBookingByIdV2(Long bookingId) {
-        if(!bookingRepository.findById(bookingId).isPresent()){
-            return null;
-        }
        return bookingRepository.findById(bookingId).get();
     }
 }

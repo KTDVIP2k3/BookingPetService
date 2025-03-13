@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @Data
 public class CreatePaymentLinkRequestBody {
-    private long bookingId;
+    private Long bookingId;
 }
