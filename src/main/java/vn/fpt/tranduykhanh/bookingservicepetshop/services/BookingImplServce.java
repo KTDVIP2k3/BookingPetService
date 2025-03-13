@@ -14,10 +14,13 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PetRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.BookingReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,7 +63,7 @@ public class BookingImplServce implements BookingInterfaceService {
 
            LocalDate today = LocalDate.now();
            LocalDate miLocalDate = today.plusDays(2);
-           if (!bookingDTO.getLocalDate().isBefore(miLocalDate)) {
+           if (bookingDTO.getLocalDate().isBefore(miLocalDate)) {
                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Thoi gian dat lich phai sau it nhat 2 ngay",null));
            }
 
@@ -68,6 +71,7 @@ public class BookingImplServce implements BookingInterfaceService {
            Booking booking = new Booking();
            booking.setUser(user);
            booking.setPet(petOpt.get());
+           booking.setLocalDate(bookingDTO.getLocalDate());
            booking.setService(serviceOpt.get());
            booking.setPayment(paymentOpt.get());
            booking.setBookingStatus(BookingStatus.PENDING);
@@ -89,18 +93,27 @@ public class BookingImplServce implements BookingInterfaceService {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Loi", e.getMessage()));
        }
     }
+
+    public BookingReponse convertoBookingReponse(Booking booking){
+        BookingReponse bookingReponse = new BookingReponse(booking.getLocalDate(),booking.getBookingStatus(), booking.getBookingStatusPaid(), booking.getUser().getUserName(),booking.getUser().getPhone(),booking.getUser().getAddress(),booking.getUser().getAvatarBase64(),booking.getService().getServiceName(), booking.getService().getPrice(), booking.getService().getDescription(),booking.getService().getImageServiceBase64(),booking.getPet().getPetName(),booking.getPet().getPetType(),
+                booking.getPet().getPetGender(), booking.getPet().getImagePetBase64(), booking.getPet().getAge(),booking.getPet().getNotes(),booking.getPayment().getPaymentMethodName(),booking.getCreateAt());
+        return bookingReponse;
+    }
     @Override
     public ResponseEntity<ResponseObj> getBookingById(Long bookingId, HttpServletRequest request) {
         if(userImplement.getUserByToken(request) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co booking nao", null));
         }
-        if(!bookingRepository.findById(bookingId).isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking does not exist", null));
+//        if(!bookingRepository.findById(bookingId).isPresent()){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking does not exist", null));
+//        }
+        List<Booking> bookingList = userImplement.getUserByToken(request).getBookingList();
+        for(Booking booking : bookingList){
+            if(booking.getId() == bookingId){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking ", convertoBookingReponse(booking)));
+            }
         }
-        if(bookingRepository.findById(bookingId).get().getBookingStatusPaid() != null){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking was paid",bookingRepository.findById(bookingId).get()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking ", bookingRepository.findById(bookingId)));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.OK.toString(), "Not Found ", null));
     }
 
     @Override
@@ -109,10 +122,18 @@ public class BookingImplServce implements BookingInterfaceService {
           if(userImplement.getUserByToken(request) == null){
               return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co booking nao", null));
           }
-          if(userImplement.getUserByToken(request).getBookingList().isEmpty()){
-              return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Danh sach booking dan trong", userImplement.getUserByToken(request).getBookingList()));
+          List<BookingReponse> bookingReponseList = new ArrayList<>();
+
+          List<Booking> bookingList = userImplement.getUserByToken(request).getBookingList();
+
+          for(Booking booking : bookingList){
+              bookingReponseList.add(convertoBookingReponse(booking));
           }
-          return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking list", userImplement.getUserByToken(request).getBookingList()));
+
+          if(userImplement.getUserByToken(request).getBookingList().isEmpty()){
+              return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Danh sach booking dan trong", bookingReponseList));
+          }
+          return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking list", bookingReponseList));
       }catch (Exception e){
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
       }
