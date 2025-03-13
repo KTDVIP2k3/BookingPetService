@@ -22,12 +22,12 @@ public class RoleController {
     }
 
     @PostMapping("createRole")
-    public ResponseEntity<ResponseObj> createRole (@RequestBody RoleDTO roleDTO){
+    public ResponseEntity<ResponseObj> createRole (@ModelAttribute RoleDTO roleDTO){
         return roleImplement.createRole(roleDTO);
     }
 
     @PutMapping("updateRole/{roleId}")
-    public ResponseEntity<ResponseObj> updateRole(@PathVariable Long roleId, @RequestBody RoleDTO roleDTO){
+    public ResponseEntity<ResponseObj> updateRole(@PathVariable Long roleId, @ModelAttribute RoleDTO roleDTO){
         if (roleDTO.getRoleName() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "roleName không được để trống");
         }
