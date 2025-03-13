@@ -1,10 +1,10 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetGenderEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetTypeEnum;
 
 import java.util.List;
 

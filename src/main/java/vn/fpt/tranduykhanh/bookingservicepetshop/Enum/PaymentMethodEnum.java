@@ -1,7 +1,4 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.model;
-
-import jakarta.persistence.Entity;
-import lombok.*;
+package vn.fpt.tranduykhanh.bookingservicepetshop.Enum;
 
 
 public enum PaymentMethodEnum  {

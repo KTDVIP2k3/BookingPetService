@@ -1,4 +1,4 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.model;
+package vn.fpt.tranduykhanh.bookingservicepetshop.Enum;
 
 import lombok.Getter;
 

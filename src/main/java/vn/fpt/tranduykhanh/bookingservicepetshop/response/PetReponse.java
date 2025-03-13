@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetGenderEnum;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetTypeEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetGenderEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetTypeEnum;
 
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,4 +1,4 @@
-package vn.fpt.tranduykhanh.bookingservicepetshop.model;
+package vn.fpt.tranduykhanh.bookingservicepetshop.Enum;
 
 public enum PetGenderEnum {
     MALE(0),

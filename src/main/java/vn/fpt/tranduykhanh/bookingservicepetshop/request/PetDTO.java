@@ -2,8 +2,8 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.request;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetGenderEnum;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetTypeEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetGenderEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PetTypeEnum;
 
 @Data
 @NoArgsConstructor

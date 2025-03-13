@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
 
 import java.util.List;
 

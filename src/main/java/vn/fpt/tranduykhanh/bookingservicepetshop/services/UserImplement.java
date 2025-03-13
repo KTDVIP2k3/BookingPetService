@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.AuthService.JWTService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.UserInterface;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.RoleEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.RoleRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.UserRepository;
@@ -130,7 +130,7 @@ public class UserImplement implements UserInterface {
     public UserResponse convertUserToUserResponse(User user){
         if(user == null)
             return null;
-        UserResponse userResponse = new UserResponse(user.getId(),user.getUserName(),user.getEmail(),user.getPhone(),user.getAddress(),user.getAvatarBase64());
+        UserResponse userResponse = new UserResponse(user.getId(),user.getUserName(),user.getEmail(),user.getPhone(),user.getAddress(),user.isActive(),user.getAvatarBase64());
         return userResponse;
     }
 

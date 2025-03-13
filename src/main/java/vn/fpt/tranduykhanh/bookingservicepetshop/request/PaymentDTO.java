@@ -2,8 +2,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.request;
 
 
 import lombok.*;
-import org.springframework.stereotype.Service;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentMethodEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
 
 @Getter
 @Setter

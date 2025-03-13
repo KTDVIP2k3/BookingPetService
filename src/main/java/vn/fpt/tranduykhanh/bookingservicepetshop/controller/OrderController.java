@@ -1,10 +1,5 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
-import org.hibernate.query.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,20 +8,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.BookingStatusPaid;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentMethodEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.BookingRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.CreatePaymentLinkRequestBody;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.CheckOutReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.OrderReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
-import vn.fpt.tranduykhanh.bookingservicepetshop.response.TransactionReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.BookingImplServce;
 import vn.payos.PayOS;
 import vn.payos.type.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 

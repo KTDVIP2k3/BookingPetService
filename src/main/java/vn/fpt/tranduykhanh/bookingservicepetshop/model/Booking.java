@@ -1,10 +1,10 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 
 import java.time.LocalDate;
 

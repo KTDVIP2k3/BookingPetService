@@ -1,7 +1,7 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.request;
 
 import lombok.*;
-import vn.fpt.tranduykhanh.bookingservicepetshop.model.RoleEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
 
 @Data
 @Getter
