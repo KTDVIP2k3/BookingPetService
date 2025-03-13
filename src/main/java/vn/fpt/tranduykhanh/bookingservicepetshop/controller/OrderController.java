@@ -15,6 +15,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.request.CreatePaymentLinkReques
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.CheckOutReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.OrderReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.TransactionReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.BookingImplServce;
 import vn.payos.PayOS;
 import vn.payos.type.*;
@@ -109,7 +110,7 @@ public class OrderController {
 //                    .description("Thanh toán đơn booking:\n"
 //                            + "Dịch vụ: " + booking.getService().getServiceName())
                     .amount(numberPayment)
-                    .returnUrl("http://localhost:8080/api/payment/status?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
+                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
                     .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
                     .build();
 
@@ -133,20 +134,19 @@ public class OrderController {
 
     @GetMapping("/cancel")
     public ResponseEntity<ResponseObj> cancelPayment(@RequestParam("orderCode") String orderCode,
-                                                     @RequestParam("bookingId") String bookingId, // Thêm bookingId vào tham số
+                                                     @RequestParam("bookingId") Long bookingId, // Thêm bookingId vào tham số
                                                      @RequestParam("status") String status){
         return null;
     }
 
-    @GetMapping("/status")
+    @GetMapping("/order")
     public ResponseEntity<ResponseObj> paymentStatus(@RequestParam("orderCode") String orderCode,
-                                                    @RequestParam("bookingId") String bookingId, // Thêm bookingId vào tham số
-                                                    @RequestParam("status") String status) throws Exception {
+                                                    @RequestParam("bookingId") Long bookingId) throws Exception {
 //        ObjectMapper objectMapper = new ObjectMapper();
 //        ObjectNode response = objectMapper.createObjectNode();
 //        System.out.println("Received status from PayOS: " + status);
         // Lấy thông tin booking từ ID
-        Booking booking = bookingImplServce.getBookingByIdV2(Long.parseLong(bookingId));
+        Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
         PaymentLinkData paymentLinkData = payos.getPaymentLinkInformation(Long.parseLong(orderCode));
 //        for (Transaction transaction : paymentLinkData.getTransactions()){
 //            TransactionReponse transactionReponse = transaction.
@@ -158,14 +158,14 @@ public class OrderController {
         }
 
         // Cập nhật trạng thái booking dựa trên status nhận được từ PayOS
-        if ("PAID".equalsIgnoreCase(status)) {
+        if ("PAID".equalsIgnoreCase(paymentLinkData.getStatus())) {
             if (booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.THANH_TOAN_TOAN_BO){
                 booking.setBookingStatusPaid(BookingStatusPaid.PAIDALL);
             }
             if(booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC){
                 booking.setBookingStatusPaid(BookingStatusPaid.DEPOSIT);
             }
-        } else if ("FAILED".equalsIgnoreCase(status)) {
+        } else if ("FAILED".equalsIgnoreCase(paymentLinkData.getStatus())) {
             booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
         } else {
             orderReponse.setPaymentLinkData(paymentLinkData);
@@ -174,6 +174,11 @@ public class OrderController {
 
         bookingRepository.save(booking);
 
+//        for (Transaction transaction : paymentLinkData.getTransactions()){
+//            TransactionReponse transactionReponse = new TransactionReponse();
+//            transactionReponse.setReference(transaction.getReference());
+//            transactionReponse.getTransactionStatus(transaction.get());
+//        }
         // Lưu cập nhật vào database
         // Gửi thông báo hoặc email
 //        notificationService.sendPaymentNotification(booking.getUserEmail(), bookingId, status);

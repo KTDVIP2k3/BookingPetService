@@ -112,7 +112,10 @@ public class UserImplement implements UserInterface {
             user.setEmail(userDTO.getEmail());
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
-            user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile())); // Sửa lỗi avatar lấy từ DTO
+            if(userDTO.getImageUserfile() != null){
+                user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile()));
+            }
+            user.setAvatarBase64(null);
             user.setRole(roleRepository.findByRoleName(RoleEnum.CUSTOMER));
             user.setActive(true);
             user.setCreateAt(LocalDateTime.now());
@@ -178,6 +181,9 @@ public class UserImplement implements UserInterface {
         user1.setEmail(userDTO.getEmail());
         user1.setAddress(userDTO.getAddress());
        try {
+           if(user.getAvatarBase64() == null){
+               user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile()));
+           }
            user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getImageUserfile(), user1.getAvatarBase64()));
        }catch (Exception e){
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));

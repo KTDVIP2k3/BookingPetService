@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @Builder
 public class Payment extends BaseEntity{
+
     private PaymentMethodEnum paymentMethodName;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
@@ -24,5 +25,5 @@ public class Payment extends BaseEntity{
 
     @OneToMany(mappedBy = "payment")
     @JsonIgnore
-    private List<Transaction> transactions;
+    private List<PaymentLinkData> paymentLinkData;
 }
