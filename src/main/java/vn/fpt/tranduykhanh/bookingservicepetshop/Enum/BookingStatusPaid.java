@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum BookingStatusPaid {
     DEPOSIT(0),
     PAIDALL(1),
-    FAILED(2);
+    FAILED(2),
+    UNPAID(3);
     private final int value;
 
     BookingStatusPaid(int value){ this.value = value; }

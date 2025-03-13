@@ -15,9 +15,8 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
-    private String reference; // Mã tham chiếu giao dịch
 
     private int amount; // Số tiền thanh toán
 
@@ -25,15 +24,15 @@ public class Transaction {
 
     private String description; // Nội dung giao dịch
 
-    private LocalDateTime transactionDateTime; // Thời gian giao dịch
+    private String transactionDateTime; // Thời gian giao dịch
 
     private String virtualAccountName; // Chủ tài khoản ảo (nếu có)
 
-    private String virtualAccountNumber; // Số tài khoản ảo (nếu có)
+    private String virtualAccountNumber;
 
-    private String counterAccountBankId; // Mã ngân hàng đối ứng (nếu có)
+    private String counterAccountBankId;
 
-    private String counterAccountBankName; // Tên ngân hàng đối ứng (nếu có)
+    private String counterAccountBankName;
 
     private String counterAccountName; // Chủ tài khoản đối ứng (nếu có)
 

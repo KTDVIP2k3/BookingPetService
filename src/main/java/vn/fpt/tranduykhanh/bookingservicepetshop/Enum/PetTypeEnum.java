@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum PetTypeEnum {
-    CAT(1),
-    DOG(2);
+            CAT(1),
+            DOG(2);
 
     private final int value;
 

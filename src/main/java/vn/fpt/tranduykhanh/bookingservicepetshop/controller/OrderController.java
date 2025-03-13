@@ -8,17 +8,23 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.BookingRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.CreatePaymentLinkRequestBody;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.PaymentLinkDataDTO;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.TransactionDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.CheckOutReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.OrderReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.TransactionReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.BookingImplServce;
+import vn.fpt.tranduykhanh.bookingservicepetshop.services.PaymentLinkDataServiceIpml;
+import vn.fpt.tranduykhanh.bookingservicepetshop.services.TransactionServiceImple;
 import vn.payos.PayOS;
 import vn.payos.type.*;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +40,10 @@ public class OrderController {
     private  CheckOutReponse checkOutReponse = new CheckOutReponse();
 
     @Autowired
+    private PaymentLinkDataServiceIpml paymentLinkDataServiceIpml;
+
+
+    @Autowired
     private BookingRepository bookingRepository;
 
     private final PayOS payos;
@@ -41,15 +51,15 @@ public class OrderController {
     @Autowired
     BookingImplServce bookingImplServce;
 
+    @Autowired
+    TransactionServiceImple transactionServiceImple;
+
     public OrderController(PayOS payOS) {
         this.payos = payOS;
     }
 
     @PostMapping(value = "/checkOut", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> createPayment(@ModelAttribute  CreatePaymentLinkRequestBody requestBody) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule());
-//        ObjectNode response = objectMapper.createObjectNode();
         Booking booking = bookingImplServce.getBookingByIdV2(requestBody.getBookingId());
 
         if (booking == null) {
@@ -57,7 +67,7 @@ public class OrderController {
         }
 
        try{
-           if(booking.getBookingStatusPaid() != null){
+           if(booking.getBookingStatusPaid() == BookingStatusPaid.DEPOSIT || booking.getBookingStatusPaid() == BookingStatusPaid.PAIDALL){
                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Booking nay da duoc tra: " + booking.getBookingStatusPaid().toString() + "-" + "Voi phuong thuc thanh toan: " + booking.getPayment().getPaymentMethodName().toString() , booking));
            }
        }catch (Exception e){
@@ -132,30 +142,129 @@ public class OrderController {
         }
     }
 
+//    ?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()
+
+//    @GetMapping("/cancel")
+//    public ResponseEntity<String> cancelPayment(
+//            @RequestParam("orderCode") String orderCode,
+//            @RequestParam("bookingId") String bookingId) {
+//        return ResponseEntity.ok("Cancel successful: orderCode=" + orderCode + ", bookingId=" + bookingId);
+//    }
+
     @GetMapping("/cancel")
     public ResponseEntity<ResponseObj> cancelPayment(@RequestParam("orderCode") String orderCode,
-                                                     @RequestParam("bookingId") Long bookingId, // Thêm bookingId vào tham số
-                                                     @RequestParam("status") String status){
-        return null;
+                                                     @RequestParam("bookingId") Long bookingId) throws Exception {
+        Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
+
+        vn.payos.type.PaymentLinkData paymentLinkData = payos.cancelPaymentLink(Long.parseLong(orderCode), "Huy don hang" );
+
+        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking.getPayment(), paymentLinkData);
+
+        try{
+            paymentLinkDataServiceIpml.createPaymentLinkData(paymentLinkDataDTO);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+        }
+
+
+        if (booking == null) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),null,null));
+        }
+
+       try{
+           PaymentLinkData paymentLinkDataModel = paymentLinkDataServiceIpml.getPaymentLinkDataById(paymentLinkDataDTO.getPaymentLinkData().getId());
+
+           if(paymentLinkDataServiceIpml.getPaymentLinkDataById(paymentLinkDataDTO.getPaymentLinkData().getId()) == null){
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Payemnt link data does not exist", null));
+           }
+
+           try{
+               for(Transaction transaction : paymentLinkData.getTransactions()){
+                   TransactionDTO transactionDTO = new TransactionDTO(paymentLinkDataModel, transaction);
+                   transactionServiceImple.createTransaction(transactionDTO);
+               }
+           }catch (Exception e){
+               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+           }
+
+       }catch (Exception e){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+       }
+
+       booking.setBookingStatusPaid(BookingStatusPaid.UNPAID);
+
+       try{
+           bookingRepository.save(booking);
+       }catch (Exception e){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+       }
+
+       orderReponse.setBooking(booking);
+       orderReponse.setPaymentLinkData(paymentLinkData);
+
+        // Cập nhật trạng thái booking dựa trên status nhận được từ PayOS
+//        if ("PAID".equalsIgnoreCase(paymentLinkData.getStatus())) {
+//            if (booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.THANH_TOAN_TOAN_BO){
+//                booking.setBookingStatusPaid(BookingStatusPaid.PAIDALL);
+//            }
+//            if(booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC){
+//                booking.setBookingStatusPaid(BookingStatusPaid.DEPOSIT);
+//            }
+//        } else if ("FAILED".equalsIgnoreCase(paymentLinkData.getStatus())) {
+//            booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
+//        } else {
+//            orderReponse.setPaymentLinkData(paymentLinkData);
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), orderReponse.getPaymentLinkData().getStatus(), null));
+//        }
+
+//        bookingRepository.save(booking);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Order Reponse ", orderReponse));
     }
 
     @GetMapping("/order")
     public ResponseEntity<ResponseObj> paymentStatus(@RequestParam("orderCode") String orderCode,
                                                     @RequestParam("bookingId") Long bookingId) throws Exception {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        ObjectNode response = objectMapper.createObjectNode();
-//        System.out.println("Received status from PayOS: " + status);
-        // Lấy thông tin booking từ ID
+
         Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
-        PaymentLinkData paymentLinkData = payos.getPaymentLinkInformation(Long.parseLong(orderCode));
-//        for (Transaction transaction : paymentLinkData.getTransactions()){
-//            TransactionReponse transactionReponse = transaction.
-//        }
+
+        vn.payos.type.PaymentLinkData paymentLinkData = payos.cancelPaymentLink(Long.parseLong(orderCode), "Huy don hang" );
+
+        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking.getPayment(), paymentLinkData);
+
+        try{
+            paymentLinkDataServiceIpml.createPaymentLinkData(paymentLinkDataDTO);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+        }
+
+
         if (booking == null) {
-//            response.put("error", -1);
-//            response.put("message", "Booking not found");
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),null,null));
         }
+
+        try{
+            PaymentLinkData paymentLinkDataModel = paymentLinkDataServiceIpml.getPaymentLinkDataById(paymentLinkDataDTO.getPaymentLinkData().getId());
+
+            if(paymentLinkDataServiceIpml.getPaymentLinkDataById(paymentLinkDataDTO.getPaymentLinkData().getId()) == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Payemnt link data does not exist", null));
+            }
+
+            try{
+                for(Transaction transaction : paymentLinkData.getTransactions()){
+                    TransactionDTO transactionDTO = new TransactionDTO(paymentLinkDataModel, transaction);
+                    transactionServiceImple.createTransaction(transactionDTO);
+                }
+            }catch (Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+            }
+
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+        }
+
 
         // Cập nhật trạng thái booking dựa trên status nhận được từ PayOS
         if ("PAID".equalsIgnoreCase(paymentLinkData.getStatus())) {
@@ -172,27 +281,15 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), orderReponse.getPaymentLinkData().getStatus(), null));
         }
 
-        bookingRepository.save(booking);
+        try{
+            bookingRepository.save(booking);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
+        }
 
-//        for (Transaction transaction : paymentLinkData.getTransactions()){
-//            TransactionReponse transactionReponse = new TransactionReponse();
-//            transactionReponse.setReference(transaction.getReference());
-//            transactionReponse.getTransactionStatus(transaction.get());
-//        }
-        // Lưu cập nhật vào database
-        // Gửi thông báo hoặc email
-//        notificationService.sendPaymentNotification(booking.getUserEmail(), bookingId, status);
+        orderReponse.setBooking(booking);
+        orderReponse.setPaymentLinkData(paymentLinkData);
 
-        // Trả về thông tin chi tiết về bookin
-
-        // Thêm các thông tin dịch vụ vào phản hồi (ví dụ số tiền dịch vụ)
-//        response.put("serviceFee", booking.getServiceFee());  // Giả sử `getServiceFee()` trả về số tiền dịch vụ
-//        response.put("totalAmount", booking.getTotalAmount()); // Giả sử `getTotalAmount()` trả về tổng số tiền
-//
-//        // Nếu cần thêm thông tin khác, bạn có thể tiếp tục thêm vào đây
-//        response.put("userName", booking.getUserName());  // Tên người dùng
-//        response.put("serviceType", booking.getServiceType());  // Loại dịch vụ, nếu có
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Order status: " + orderReponse.getPaymentLinkData().getStatus(), orderReponse));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Order: ", orderReponse));
     }
 }

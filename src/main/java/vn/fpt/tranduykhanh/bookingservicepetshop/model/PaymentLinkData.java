@@ -23,7 +23,7 @@ public class PaymentLinkData {
     @Id
     private String id; // ID link thanh toán
 
-    private Long orderCode; // Mã đơn hàng
+    private long orderCode; // Mã đơn hàng
 
     private int amount; // Tổng số tiền thanh toán
 
@@ -33,11 +33,11 @@ public class PaymentLinkData {
 
     private String status; // Trạng thái thanh toán
 
-    private LocalDateTime createdAt; // Ngày tạo link thanh toán
+    private String createdAt; // Ngày tạo link thanh toán
 
     private String cancellationReason; // Lý do hủy thanh toán (nếu có)
 
-    private LocalDateTime canceledAt; // Ngày hủy thanh toán (nếu có)
+    private String canceledAt; // Ngày hủy thanh toán (nếu có)
 
     @OneToMany(mappedBy = "paymentLink", cascade = CascadeType.ALL)
     private List<Transaction> transactions;

@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.ForgotPassWordDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
@@ -37,6 +40,16 @@ public class UserController {
             log.error("Lỗi khi lấy danh sách users: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
         }
+     }
+
+     @PostMapping(value = "/v1/forGotPassword")
+     public ResponseEntity<ResponseObj> forGotPassword(@RequestBody ForgotPassWordDTO forgotPassWordDTO){
+        return userService.forGotPassword(forgotPassWordDTO);
+     }
+
+     @PostMapping(value = "v1/setRoleForUser/{userId}")
+     public ResponseEntity<ResponseObj> setRoleForUser(@PathVariable Long userId, @RequestParam RoleEnum roleEnum){
+        return userService.setUserRole(userId, roleEnum);
      }
 
     @PostMapping(value = "/v1/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

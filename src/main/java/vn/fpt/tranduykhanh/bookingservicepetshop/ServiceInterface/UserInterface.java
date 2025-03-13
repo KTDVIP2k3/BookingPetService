@@ -2,11 +2,17 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.ForgotPassWordDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 
 public interface UserInterface {
+    public ResponseEntity<ResponseObj> setUserRole(Long userId, RoleEnum roleEnum);
+
+    public ResponseEntity<ResponseObj> forGotPassword(ForgotPassWordDTO forgotPassWordDTO);
+
     public  ResponseEntity<ResponseObj> getAllAccount();
 
     public ResponseEntity<ResponseObj> getUserProfile(HttpServletRequest request);

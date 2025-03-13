@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.AuthService.JWTService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.UserInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.Role;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.RoleRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.UserRepository;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.ForgotPassWordDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
@@ -44,6 +46,38 @@ public class UserImplement implements UserInterface {
     private UploadImageFileService uploadImageFileService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+
+    @Override
+    public ResponseEntity<ResponseObj> setUserRole(Long userId, RoleEnum roleEnum) {
+        try{
+            User user = userRepository.findById(userId).get();
+            Role role = roleRepository.findByRoleName(roleEnum);
+            user.setRole(role);
+            user.setUpdateAt(LocalDateTime.now());
+            userRepository.save(user);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Set role for user successfully" + roleEnum.toString(),user));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Server error: " + e.getMessage(), null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> forGotPassword(ForgotPassWordDTO forgotPassWordDTO) {
+       try{
+           if(!userRepository.existsByUserName(forgotPassWordDTO.getUserName())){
+               return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "User does not exist", null));
+           }
+           User user = userRepository.findByUserName(forgotPassWordDTO.getUserName());
+           user.setPassword(passwordEncoder.encode(forgotPassWordDTO.getNewPassword()));
+           user.setUpdateAt(LocalDateTime.now());
+           userRepository.save(user);
+           return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update password successfully", null));
+       }catch (Exception e){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Server error: " + e.getMessage(), null));
+       }
+    }
 
     @Override
     public ResponseEntity<ResponseObj> getAllAccount() {
@@ -230,7 +264,7 @@ public class UserImplement implements UserInterface {
             User user = userRepository.findById(userId).get();
             user.setActive(true);
             userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Bann account successfully", null));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "UnBan account successfully", null));
 
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.OK.toString(), e.toString(),null));
