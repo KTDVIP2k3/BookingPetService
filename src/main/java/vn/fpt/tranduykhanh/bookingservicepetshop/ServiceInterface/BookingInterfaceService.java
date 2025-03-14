@@ -14,6 +14,8 @@ public interface BookingInterfaceService {
 
     ResponseEntity<ResponseObj> getAllBookingByUser(HttpServletRequest request);
 
+    ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
+
     interface RoleInterface {
         ResponseEntity<ResponseObj> createRole (RoleDTO roleDTO);
 

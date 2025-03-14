@@ -21,6 +21,11 @@ public class BookingController {
         return bookingImplServce.getAllBookingByUser(request);
     }
 
+    @GetMapping("/v1/getAllBookingByAmind")
+    public ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request){
+        return bookingImplServce.getAllBookingByAdmin(request);
+    }
+
     @GetMapping("v1/getBookingByIdByUser/{bookingId}")
     public ResponseEntity<ResponseObj> getBookingByIdByUser(@PathVariable Long bookingId, HttpServletRequest request){
         return bookingImplServce.getBookingById(bookingId,request);

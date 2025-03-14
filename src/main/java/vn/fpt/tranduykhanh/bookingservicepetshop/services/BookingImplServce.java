@@ -141,6 +141,31 @@ public class BookingImplServce implements BookingInterfaceService {
       }
     }
 
+    @Override
+    public ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request) {
+        try{
+            if(userImplement.getUserByToken(request) == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co booking nao", null));
+            }
+            List<BookingReponse> bookingReponseList = new ArrayList<>();
+
+            User user = userImplement.getUserByToken(request);
+
+            List<Booking> bookingList = bookingRepository.findAll();
+
+            for(Booking booking : bookingList){
+                bookingReponseList.add(convertoBookingReponse(booking));
+            }
+
+            if(userImplement.getUserByToken(request).getBookingList().isEmpty()){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Danh sach booking dan trong", bookingReponseList));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking list", bookingReponseList));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+        }
+    }
+
     public Booking getBookingByIdV2(Long bookingId) {
        return bookingRepository.findById(bookingId).get();
     }
