@@ -1,13 +1,13 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.request;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
 
     private String userName;
@@ -20,7 +20,7 @@ public class UserDTO {
 
     private String address;
 
-    private MultipartFile imageUserfile;
+    private MultipartFile userImageFile;
 
     public String getUserName() {
         return userName;

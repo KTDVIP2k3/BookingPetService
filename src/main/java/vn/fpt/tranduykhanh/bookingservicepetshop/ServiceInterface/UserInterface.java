@@ -2,6 +2,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ForgotPassWordDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;

@@ -51,6 +51,9 @@ public class PetServiceImpl implements PetService {
         pet.setActive(true);
         pet.setCreateAt(LocalDateTime.now());
       try{
+          if(petDTO.getPetImage() == null){
+              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), " Image Cannot be null", null));
+          }
           pet.setImagePetBase64(uploadImageFileService.uploadImage(petDTO.getPetImage()));
       }catch (Exception e){
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
@@ -122,6 +125,11 @@ public class PetServiceImpl implements PetService {
            existPet.setNotes(petDTO.getNotes());
            existPet.setNotes(petDTO.getNotes());
            try{
+               if(existPet.getImagePetBase64() == null){
+
+                   existPet.setImagePetBase64(uploadImageFileService.uploadImage(petDTO.getPetImage()));
+               }
+
                existPet.setImagePetBase64(uploadImageFileService.updateImage(petDTO.getPetImage(), existPet.getImagePetBase64()));
            }catch (Exception e){
                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));

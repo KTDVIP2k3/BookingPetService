@@ -59,14 +59,17 @@ public class OrderController {
     public ResponseEntity<ResponseObj> createPayment(@ModelAttribute  CreatePaymentLinkRequestBody requestBody) {
         Booking booking = bookingImplServce.getBookingByIdV2(requestBody.getBookingId());
 
+        BookingReponse bookingReponse =bookingImplServce.convertoBookingReponse(booking);
+
         if (booking == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Booking not found", null));
         }
 
        try{
            if(booking.getBookingStatusPaid() == BookingStatusPaid.DEPOSIT || booking.getBookingStatusPaid() == BookingStatusPaid.PAIDALL){
-               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Booking nay da duoc tra: " + booking.getBookingStatusPaid().toString() + "-" + "Voi phuong thuc thanh toan: " + booking.getPayment().getPaymentMethodName().toString() , booking));
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Booking nay da duoc tra: " + booking.getBookingStatusPaid().toString() + "-" + "Voi phuong thuc thanh toan: " + booking.getPayment().getPaymentMethodName().toString() , bookingImplServce.convertoBookingReponse(booking)));
            }
+
        }catch (Exception e){
            logger.error("Lỗi khi xử lý booking status: ", e);
 
@@ -117,11 +120,14 @@ public class OrderController {
 //                    .description("Thanh toán đơn booking:\n"
 //                            + "Dịch vụ: " + booking.getService().getServiceName())
                     .amount(numberPayment)
-                    .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
-                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
+                    .returnUrl("https://exe-201-web.vercel.app/handle-payment") // Gửi bookingId về
+                    .cancelUrl("https://exe-201-web.vercel.app/handle-payment")
                     .build();
 
             // Gọi PayOS để tạo link thanh toán
+//            .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
+//                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
+//                    .build();
 
             try {
                 CheckoutResponseData data = payos.createPaymentLink(paymentData);

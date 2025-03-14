@@ -58,7 +58,11 @@ public class ServiceImplement implements ServiceInterface {
             service.setServiceName(serviceDTO.getServiceName()); // Lấy từ DTO
             service.setDescription(serviceDTO.getServiceDescription()); // Lấy từ DTO
             service.setPrice(serviceDTO.getServicePrice()); // Lấy từ DTO
+            if(service.getImageServiceBase64() == null){
+                service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
+            }
             service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
+
             service.setCreateAt(LocalDateTime.now());
             service.setActive(true);
             serviceRepository.save(service);

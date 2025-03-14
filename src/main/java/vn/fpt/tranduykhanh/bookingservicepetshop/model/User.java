@@ -45,6 +45,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     // Tránh vòng lặp khi serialize JSON
+    @JsonIgnore
     private List<Booking> bookingList;
 
     @ManyToOne

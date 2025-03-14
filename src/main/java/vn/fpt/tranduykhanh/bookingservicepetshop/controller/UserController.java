@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ForgotPassWordDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
@@ -53,7 +54,13 @@ public class UserController {
      }
 
     @PostMapping(value = "/v1/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> signUp(@ModelAttribute UserDTO userDTO){
+    public ResponseEntity<ResponseObj> signUp(@RequestParam("name") String userName,
+                                              @RequestParam("email") String email,
+                                              @RequestParam("phone") String phone,
+                                              @RequestParam("password") String password,
+                                              @RequestParam("address") String adress,// Nhận JSON dạng form-data
+                                              @RequestParam(value = "file", required = false) MultipartFile userImageFile){
+        UserDTO userDTO = new UserDTO(userName, email, phone, password, adress, userImageFile);
         return userService.signUpByUserNameAndPassword(userDTO);
     }
 
@@ -63,10 +70,16 @@ public class UserController {
     }
 
     @PutMapping(value = "/v1/updateUserProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> updateUserById(HttpServletRequest request, @ModelAttribute UserDTO userDTO){
+    public ResponseEntity<ResponseObj> updateUserById(HttpServletRequest request,
+                                                      @RequestParam("name") String userName,
+                                                      @RequestParam("email") String email,
+                                                      @RequestParam("phone") String phone,
+                                                      @RequestParam("password") String password,
+                                                      @RequestParam("address") String adress,// Nhận JSON dạng form-data
+                                                      @RequestParam(value = "file", required = false) MultipartFile userImageFile){
+            UserDTO userDTO = new UserDTO(userName, email, phone, password, adress, userImageFile);
             return userService.updateUserProfile(request, userDTO);
     }
-
     @PutMapping("/v1/banAccountById/{userId}")
     public ResponseEntity<ResponseObj> banAccountById(@PathVariable Long userId){
         return userService.banUserById(userId);

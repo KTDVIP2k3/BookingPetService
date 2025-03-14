@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.fpt.tranduykhanh.bookingservicepetshop.AuthService.JWTService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.UserInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.RoleEnum;
@@ -122,9 +123,6 @@ public class UserImplement implements UserInterface {
 
     @Override
     public ResponseEntity<ResponseObj> signUpByUserNameAndPassword(UserDTO userDTO) {
-        System.out.println("Received UserDTO: " + userDTO); // Kiểm tra log
-        System.out.println("Password: " + userDTO.getPassword()); // Kiểm tra password
-
         // Kiểm tra username đã tồn tại chưa
         if (userRepository.existsByUserName(userDTO.getUserName())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -132,7 +130,7 @@ public class UserImplement implements UserInterface {
         }
 
         // Kiểm tra password null hoặc rỗng
-        if (userDTO.getPassword() == null || userDTO.getPassword().isEmpty()) {
+        if (userDTO.getPassword() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Password cannot be null or empty", false));
         }
@@ -146,9 +144,10 @@ public class UserImplement implements UserInterface {
             user.setEmail(userDTO.getEmail());
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
-            if(userDTO.getImageUserfile() != null){
-                user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile()));
+            if(userDTO.getUserImageFile() != null){
+                user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
             }
+
             user.setAvatarBase64(null);
             user.setRole(roleRepository.findByRoleName(RoleEnum.CUSTOMER));
             user.setActive(true);
@@ -214,14 +213,17 @@ public class UserImplement implements UserInterface {
         user1.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user1.setEmail(userDTO.getEmail());
         user1.setAddress(userDTO.getAddress());
-       try {
-           if(user.getAvatarBase64() == null){
-               user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getImageUserfile()));
-           }
-           user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getImageUserfile(), user1.getAvatarBase64()));
-       }catch (Exception e){
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
-       }
+      if(userDTO.getUserImageFile() == null){
+          user1.setAvatarBase64(null);
+      }
+        try {
+            if(user.getAvatarBase64() == null){
+                user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
+            }
+            user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+        }
         user1.setUpdateAt(LocalDateTime.now());
         userRepository.save(user1);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update Succesfully", convertUserToUserResponse(user1)));
