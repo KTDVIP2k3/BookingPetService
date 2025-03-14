@@ -50,6 +50,7 @@ public class PetServiceImpl implements PetService {
         pet.setPetType(petDTO.getPetTypeEnum());
         pet.setPetGender(petDTO.getPetGenderEnum());
         pet.setAge(petDTO.getAge());
+        pet.setNotes(petDTO.getNotes());
         pet.setActive(true);
         pet.setCreateAt(LocalDateTime.now());
       try{

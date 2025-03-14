@@ -120,18 +120,18 @@ public class OrderController {
 //                    .description("Thanh toán đơn booking:\n"
 //                            + "Dịch vụ: " + booking.getService().getServiceName())
                     .amount(numberPayment)
-                    .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
-                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
-                    .build();
+//                    .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
+//                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
+//                    .build();
 
 //                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
 //                    .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
 //                    .build();
 
 //            bookingpetservice.onrender.com
-//                    .returnUrl("https://exe-201-web.vercel.app/handle-payment") // Gửi bookingId về
-//                    .cancelUrl("https://exe-201-web.vercel.app/handle-payment")
-//                    .build();
+                    .returnUrl("https://exe-201-web.vercel.app/handle-payment") // Gửi bookingId về
+                    .cancelUrl("https://exe-201-web.vercel.app/handle-payment")
+                    .build();
 
             // Gọi PayOS để tạo link thanh toán
 //            .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
