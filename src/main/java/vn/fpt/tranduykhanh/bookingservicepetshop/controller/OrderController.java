@@ -117,8 +117,8 @@ public class OrderController {
 //                    .description("Thanh toán đơn booking:\n"
 //                            + "Dịch vụ: " + booking.getService().getServiceName())
                     .amount(numberPayment)
-                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
-                    .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
+                    .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
+                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
                     .build();
 
             // Gọi PayOS để tạo link thanh toán
