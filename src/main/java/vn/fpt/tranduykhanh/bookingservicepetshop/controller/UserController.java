@@ -62,7 +62,7 @@ public class UserController {
         return userService.loginByUserName(loginUserDTO);
     }
 
-    @PutMapping("/v1/updateUserProfile")
+    @PutMapping(value = "/v1/updateUserProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> updateUserById(HttpServletRequest request, @ModelAttribute UserDTO userDTO){
             return userService.updateUserProfile(request, userDTO);
     }
