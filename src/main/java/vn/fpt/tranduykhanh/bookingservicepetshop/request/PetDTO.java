@@ -20,8 +20,6 @@ public class PetDTO {
 
     private int Age;
 
-    private MultipartFile petImage;
-
     private String notes;
 
 }

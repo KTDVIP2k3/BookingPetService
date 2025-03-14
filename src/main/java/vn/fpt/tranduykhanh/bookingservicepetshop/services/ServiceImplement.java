@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.ServiceInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
@@ -52,17 +53,21 @@ public class ServiceImplement implements ServiceInterface {
     }
 
     @Override
-    public ResponseEntity<ResponseObj> createService(ServiceDTO serviceDTO) {
+    public ResponseEntity<ResponseObj> createService(ServiceDTO serviceDTO, MultipartFile serviceImageFile) {
         try {
             PetService service = new PetService();
             service.setServiceName(serviceDTO.getServiceName()); // Lấy từ DTO
             service.setDescription(serviceDTO.getServiceDescription()); // Lấy từ DTO
             service.setPrice(serviceDTO.getServicePrice()); // Lấy từ DTO
-            if(service.getImageServiceBase64() == null){
-                service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
-            }
-            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
+//            if(service.getImageServiceBase64() == null){
+//                service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
+//            }
+//            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
 
+            if(serviceImageFile == null){
+                service.setImageServiceBase64(null);
+            }
+            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
             service.setCreateAt(LocalDateTime.now());
             service.setActive(true);
             serviceRepository.save(service);
@@ -76,7 +81,7 @@ public class ServiceImplement implements ServiceInterface {
     }
 
     @Override
-    public ResponseEntity<ResponseObj> updateService(Long id, ServiceDTO serviceDTO) {
+    public ResponseEntity<ResponseObj> updateService(Long id, ServiceDTO serviceDTO, MultipartFile serviceImageFile) {
         Optional<PetService> existingServiceOpt =serviceRepository.findById(id);
 
         if (!existingServiceOpt.isPresent()) {
@@ -89,7 +94,18 @@ public class ServiceImplement implements ServiceInterface {
             existingService.setDescription(serviceDTO.getServiceDescription());
             existingService.setPrice(serviceDTO.getServicePrice());
             existingService.setUpdateAt(LocalDateTime.now());
-            existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
+            if(serviceImageFile == null){
+                existingService.setImageServiceBase64(null);
+
+            }else{
+                if(existingService.getImageServiceBase64() == null){
+                    existingService.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+                }else{
+                    existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingService.getImageServiceBase64()));
+                }
+            }
+
+//            existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
             serviceRepository.save(existingService);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", convertServiceToServiceResponseById(id)));
         }catch (Exception e){

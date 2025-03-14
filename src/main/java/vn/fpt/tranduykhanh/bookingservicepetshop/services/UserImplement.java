@@ -215,15 +215,17 @@ public class UserImplement implements UserInterface {
         user1.setAddress(userDTO.getAddress());
       if(userDTO.getUserImageFile() == null){
           user1.setAvatarBase64(null);
+      }else{
+          try {
+              if(user.getAvatarBase64() == null){
+                  user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
+              }else{
+                  user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
+              }
+          }catch (Exception e){
+              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+          }
       }
-        try {
-            if(user.getAvatarBase64() == null){
-                user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
-            }
-            user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
-        }
         user1.setUpdateAt(LocalDateTime.now());
         userRepository.save(user1);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update Succesfully", convertUserToUserResponse(user1)));

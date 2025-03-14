@@ -45,14 +45,23 @@ public class ServiceController {
 //    }
 
     @Operation(summary = "Upload một file ảnh cho service")
-    @PostMapping(value = "/v1/createService", consumes = "multipart/form-data")
-    public ResponseEntity<ResponseObj> createService(@ModelAttribute ServiceDTO serviceDTO){
-        return serviceImplement.createService(serviceDTO);
+    @PostMapping(value = "/v1/createService", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseObj> createService(@RequestParam("serviceNAme") String serviceName,
+                                                     @RequestParam("description") String serviceDescription,
+                                                     @RequestParam("price") double price,
+                                                     @RequestPart(value = "file", required = false) MultipartFile serviceImage){
+        ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price);
+        return serviceImplement.createService(serviceDTO, serviceImage);
     }
     @Operation(summary = "Update ảnh mới và xóa ảnh cũ")
     @PutMapping(value = "/v1/update/{serviceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> updateServiceById(@PathVariable Long serviceId, @ModelAttribute ServiceDTO serviceDTO){
-        return serviceImplement.updateService(serviceId, serviceDTO);
+    public ResponseEntity<ResponseObj> updateServiceById(@PathVariable Long serviceId,
+                                                         @RequestParam("serviceNAme") String serviceName,
+                                                         @RequestParam("description") String serviceDescription,
+                                                         @RequestParam("price") double price,
+                                                         @RequestParam(value = "file", required = false) MultipartFile serviceImageFile){
+        ServiceDTO serviceDTO = new ServiceDTO(serviceName,serviceDescription, price);
+        return serviceImplement.updateService(serviceId, serviceDTO, serviceImageFile);
     }
 
 //    @PutMapping(value = "/updateService/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

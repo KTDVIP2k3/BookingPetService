@@ -1,8 +1,15 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 
 
 public class ServiceDTO {
@@ -12,7 +19,6 @@ public class ServiceDTO {
 
     private double servicePrice;
 
-    private MultipartFile imageService;
 
     public String getServiceName() {
         return serviceName;
@@ -38,11 +44,4 @@ public class ServiceDTO {
         this.servicePrice = servicePrice;
     }
 
-    public MultipartFile getImageService() {
-        return imageService;
-    }
-
-    public void setImageService(MultipartFile imageService) {
-        this.imageService = imageService;
-    }
 }

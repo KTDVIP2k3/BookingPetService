@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PetService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
@@ -14,6 +15,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.request.PetDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.PetReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 
+import java.nio.channels.MulticastChannel;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class PetServiceImpl implements PetService {
     private UserImplement userImplement;
 
     @Override
-    public ResponseEntity<ResponseObj> createPet(PetDTO petDTO, HttpServletRequest request) {
+    public ResponseEntity<ResponseObj> createPet(PetDTO petDTO, MultipartFile petImage, HttpServletRequest request) {
         User user = userImplement.getUserByToken(request);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -51,10 +53,10 @@ public class PetServiceImpl implements PetService {
         pet.setActive(true);
         pet.setCreateAt(LocalDateTime.now());
       try{
-          if(petDTO.getPetImage() == null){
+          if(petImage == null){
               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), " Image Cannot be null", null));
           }
-          pet.setImagePetBase64(uploadImageFileService.uploadImage(petDTO.getPetImage()));
+          pet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
       }catch (Exception e){
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
       }
@@ -111,26 +113,29 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public ResponseEntity<ResponseObj> updatePetByUser(Long petId, PetDTO petDTO, HttpServletRequest request) {
+    public ResponseEntity<ResponseObj> updatePetByUser(Long petId, PetDTO petDTO, MultipartFile petImage, HttpServletRequest request) {
        try{
            if(userImplement.getUserByToken(request) == null){
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co tai khoan nay de cap nhat pet", null));
            }
            Pet existPet = petRepository.findById(petId).get();
-           if (existPet == null)
-               return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Pet nay khong ton tai", null));
            existPet.setPetName(petDTO.getPetName());
            existPet.setPetType(petDTO.getPetTypeEnum());
            existPet.setPetGender(petDTO.getPetGenderEnum());
            existPet.setNotes(petDTO.getNotes());
            existPet.setNotes(petDTO.getNotes());
            try{
-               if(existPet.getImagePetBase64() == null){
+             if(petImage == null){
+                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Pet image cannot be null", null));
+             }else{
+                 if(existPet.getImagePetBase64() == null){
 
-                   existPet.setImagePetBase64(uploadImageFileService.uploadImage(petDTO.getPetImage()));
-               }
+                     existPet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
 
-               existPet.setImagePetBase64(uploadImageFileService.updateImage(petDTO.getPetImage(), existPet.getImagePetBase64()));
+                 }else{
+                     existPet.setImagePetBase64(uploadImageFileService.updateImage(petImage, existPet.getImagePetBase64()));
+                 }
+             }
            }catch (Exception e){
                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
            }
