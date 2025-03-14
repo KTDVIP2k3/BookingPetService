@@ -24,6 +24,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.request.LoginUserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
+import vn.fpt.tranduykhanh.bookingservicepetshop.utils.AuthenUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,6 +40,9 @@ public class UserImplement implements UserInterface {
 
     @Autowired
     JWTService jwtService;
+
+    @Autowired
+    AuthenUtil authenUtil;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -273,6 +277,14 @@ public class UserImplement implements UserInterface {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.OK.toString(), e.toString(),null));
         }
+    }
+
+    public String hello() {
+        User currentUser = authenUtil.getCurrentUSer();
+        if(currentUser == null){
+            return "Chua dang nhap";
+        }
+        return "Dang nahp roi";
     }
 
 

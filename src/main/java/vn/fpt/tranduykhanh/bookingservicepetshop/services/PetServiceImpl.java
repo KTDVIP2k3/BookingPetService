@@ -14,6 +14,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.UserRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PetDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.PetReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
+import vn.fpt.tranduykhanh.bookingservicepetshop.utils.AuthenUtil;
 
 import java.nio.channels.MulticastChannel;
 import java.time.LocalDateTime;
@@ -35,9 +36,13 @@ public class PetServiceImpl implements PetService {
     @Autowired
     private UserImplement userImplement;
 
+    @Autowired
+    private AuthenUtil authenUtil;
+
     @Override
     public ResponseEntity<ResponseObj> createPet(PetDTO petDTO, MultipartFile petImage, HttpServletRequest request) {
         User user = userImplement.getUserByToken(request);
+        User user1 = authenUtil.getCurrentUSer();
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Người dùng không tồn tại", null));

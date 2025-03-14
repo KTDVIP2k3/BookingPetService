@@ -129,8 +129,8 @@ public class OrderController {
 //                    .build();
 
 //            bookingpetservice.onrender.com
-                    .returnUrl("https://exe-201-web.vercel.app/handle-payment") // Gửi bookingId về
-                    .cancelUrl("https://exe-201-web.vercel.app/handle-payment")
+                    .returnUrl("https://exe-201-web.vercel.app") // Gửi bookingId về
+                    .cancelUrl("https://exe-201-web.vercel.app")
                     .build();
 
             // Gọi PayOS để tạo link thanh toán

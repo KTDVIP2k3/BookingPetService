@@ -64,6 +64,11 @@ public class UserController {
         return userService.signUpByUserNameAndPassword(userDTO);
     }
 
+    @GetMapping("hello")
+    public String a(){
+        return userService.hello();
+    }
+
     @PostMapping("/v1/login")
     public ResponseEntity<ResponseObj> login(@RequestBody LoginUserDTO loginUserDTO){
         return userService.loginByUserName(loginUserDTO);
