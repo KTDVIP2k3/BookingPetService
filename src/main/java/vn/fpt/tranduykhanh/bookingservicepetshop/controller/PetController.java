@@ -21,20 +21,45 @@ public class PetController {
 
     @PostMapping(value = "/v1/createPet", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> createPet(@RequestPart(value = "petName", required = false) String petName,
-                                                 @RequestPart(value = "petType", required = false) PetTypeEnum petType,
-                                                 @RequestPart(value = "petGender", required = false) PetGenderEnum petGender,
+                                                 @RequestPart(value = "petType", required = false) String petType,
+                                                 @RequestPart(value = "petGender", required = false) String petGender,
                                                  @RequestPart(value = "petAge", required = false) String petAge,
                                                  @RequestPart(value = "note", required = false) String note,
                                                  @RequestPart(value = "file", required = false) MultipartFile petImage,
                                                  HttpServletRequest request) {
-        try{
-            int petAge1 = Integer.parseInt(petAge);
-            PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
-            return petService.createPet(petDTO,petImage, request);
-        } catch (NumberFormatException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số", null));
+        int petAge1 = Integer.parseInt(petAge);
+        PetTypeEnum petType1 = null;
+        if (petType != null && !petType.isEmpty()) {
+            try {
+                petType1 = PetTypeEnum.valueOf(petType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Invalid pet type, cat or dog", null));
+            }
         }
+
+        // Xử lý petGender Enum
+        PetGenderEnum petGenderEnum = null;
+        if (petGender != null && !petGender.isEmpty()) {
+            try {
+                petGenderEnum = PetGenderEnum.valueOf(petGender.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),"Invalid pet gender, male or female", null));
+            }
+        }
+
+        if(petAge != null && !petAge.isEmpty()){
+            try{
+                petAge1 = Integer.parseInt(petAge.toUpperCase());
+                PetDTO petDTO = new PetDTO(petName, petType1, petGenderEnum, petAge1, note);
+                return petService.createPet(petDTO,petImage, request);
+            } catch (NumberFormatException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số", null));
+            }
+        }
+
+        PetDTO petDTO = new PetDTO(petName, petType1, petGenderEnum, petAge1, note);
+        return petService.createPet(petDTO,petImage,request);
     }
 
     @GetMapping("/v1/getPetListOfUser")
@@ -50,23 +75,42 @@ public class PetController {
     @PutMapping(value = "/v1/updatePet/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> updatePet(@PathVariable Long petId,
                                                  @RequestPart(value = "petName", required = false) String petName,
-                                                 @RequestPart(value = "petType", required = false) PetTypeEnum petType,
-                                                 @RequestPart(value = "petGender", required = false) PetGenderEnum petGender,
+                                                 @RequestPart(value = "petType", required = false) String petType,
+                                                 @RequestPart(value = "petGender", required = false) String petGender,
                                                  @RequestPart(value = "petAge", required = false) String petAge,
                                                  @RequestPart(value = "note", required = false) String note,
                                                  @RequestPart(value = "file", required = false) MultipartFile petImage,
                                                  HttpServletRequest request){
         int petAge1 = 0;
-       if(petAge != null && !petAge.isEmpty()){
+        PetTypeEnum petType1 = null;
+        if (petType != null && !petType.isEmpty()) {
+            try {
+                petType1 = PetTypeEnum.valueOf(petType.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Invalid pet type, they are cat or dog", null));
+            }
+        }
+
+        // Xử lý petGender Enum
+        PetGenderEnum petGenderEnum = null;
+        if (petGender != null && !petGender.isEmpty()) {
+            try {
+                petGenderEnum = PetGenderEnum.valueOf(petGender.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),"Invalid pet gender, male or female", null));
+            }
+        }
+
+        if(petAge != null && !petAge.isEmpty()){
            try{
                petAge1 = Integer.parseInt(petAge);
-               PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
+               PetDTO petDTO = new PetDTO(petName, petType1, petGenderEnum, petAge1, note);
                return petService.updatePetByUser(petId,petDTO,petImage, request);
            }catch (NumberFormatException number){
                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số",null));
            }
        }
-        PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
+        PetDTO petDTO = new PetDTO(petName, petType1, petGenderEnum, petAge1, note);
         return petService.updatePetByUser(petId,petDTO,petImage, request);
     }
 
