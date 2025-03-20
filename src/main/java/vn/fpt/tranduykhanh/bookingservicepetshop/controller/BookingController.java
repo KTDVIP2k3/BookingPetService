@@ -28,7 +28,22 @@ public class BookingController {
 
     @GetMapping("v1/getBookingByIdByUser/{bookingId}")
     public ResponseEntity<ResponseObj> getBookingByIdByUser(@PathVariable Long bookingId, HttpServletRequest request){
-        return bookingImplServce.getBookingById(bookingId,request);
+        return bookingImplServce.getBookingByIdByUser(bookingId,request);
+    }
+
+    @GetMapping("v1/getBookingDetailByIdByUser/{bookingId}")
+    public ResponseEntity<ResponseObj> getBookingDetailByIdByUser(@PathVariable Long bookingId, HttpServletRequest request){
+        return bookingImplServce.getBookingDetailByUser(bookingId,request);
+    }
+
+    @GetMapping("v1/getBookingDetailByIdByAdmin/{bookingId}")
+    public ResponseEntity<ResponseObj> getBookingDetailByIdByAdmin(@PathVariable Long bookingId){
+        return bookingImplServce.getBookingByIdByAdmin(bookingId);
+    }
+
+    @GetMapping("v1/getBookingByIdByAdmin/{bookingId}")
+    public ResponseEntity<ResponseObj> getBookingByIdByAdmin(@PathVariable Long bookingId){
+        return bookingImplServce.getBookingByIdByAdmin(bookingId);
     }
     @PostMapping(value = "/v1/bookingByUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> bookingByUser(@ModelAttribute BookingDTO bookingDTO, HttpServletRequest request){

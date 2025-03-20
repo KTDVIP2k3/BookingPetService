@@ -14,6 +14,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PetRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
+import vn.fpt.tranduykhanh.bookingservicepetshop.response.BookingDetailReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.BookingReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 
@@ -95,18 +96,21 @@ public class BookingImplServce implements BookingInterfaceService {
     }
 
     public BookingReponse convertoBookingReponse(Booking booking){
-        BookingReponse bookingReponse = new BookingReponse(booking.getId(),booking.getLocalDate(),booking.getBookingStatus(), booking.getBookingStatusPaid(), booking.getUser().getUserName(),booking.getUser().getPhone(),booking.getUser().getAddress(),booking.getUser().getAvatarBase64(),booking.getService().getServiceName(), booking.getService().getPrice(), booking.getService().getDescription(),booking.getService().getImageServiceBase64(),booking.getPet().getPetName(),booking.getPet().getPetType(),
-                booking.getPet().getPetGender(), booking.getPet().getImagePetBase64(), booking.getPet().getAge(),booking.getPet().getNotes(),booking.getPayment().getPaymentMethodName(),booking.getCreateAt());
+        BookingReponse bookingReponse = new BookingReponse(booking.getId(),booking.getUser().getFullName(), booking.getService().getServiceName(), booking.getPet().getPetName(), booking.getLocalDate(), booking.getBookingStatus(), booking.getBookingStatusPaid());
         return bookingReponse;
     }
+
+    public BookingDetailReponse convertBookingDetailReponse(Booking booking){
+
+        BookingDetailReponse bookingDetailReponse = new BookingDetailReponse(booking.getId(),booking.getLocalDate(),booking.getBookingStatus(), booking.getBookingStatusPaid(), booking.getUser().getFullName(),booking.getUser().getPhone(),booking.getUser().getAddress(),booking.getUser().getAvatarBase64(),booking.getService().getServiceName(), booking.getService().getPrice(), booking.getService().getDescription(),booking.getService().getImageServiceBase64(),booking.getPet().getPetName(),booking.getPet().getPetType(),
+                booking.getPet().getPetGender(), booking.getPet().getImagePetBase64(), booking.getPet().getAge(),booking.getPet().getNotes(),booking.getPayment().getPaymentMethodName(),booking.getCreateAt());
+        return bookingDetailReponse;
+    }
     @Override
-    public ResponseEntity<ResponseObj> getBookingById(Long bookingId, HttpServletRequest request) {
+    public ResponseEntity<ResponseObj> getBookingByIdByUser(Long bookingId, HttpServletRequest request) {
         if(userImplement.getUserByToken(request) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co booking nao", null));
         }
-//        if(!bookingRepository.findById(bookingId).isPresent()){
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking does not exist", null));
-//        }
         List<Booking> bookingList = userImplement.getUserByToken(request).getBookingList();
         for(Booking booking : bookingList){
             if(booking.getId() == bookingId){
@@ -114,6 +118,47 @@ public class BookingImplServce implements BookingInterfaceService {
             }
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.OK.toString(), "Not Found ", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> getBookingDetailByUser(Long bookingId, HttpServletRequest request) {
+        if(userImplement.getUserByToken(request) == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co booking nao", null));
+        }
+
+        List<Booking> bookingList = userImplement.getUserByToken(request).getBookingList();
+        for(Booking booking : bookingList){
+            if(booking.getId() == bookingId){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking ", convertBookingDetailReponse(booking)));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.OK.toString(), "Not Found ", null));
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> getBookingDetailByAdmin(Long bookingId) {
+        try{
+            Optional<Booking> booking = bookingRepository.findById(bookingId);
+            if(booking == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking ", null));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking!", convertBookingDetailReponse(booking.get())));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> getBookingByIdByAdmin(Long bookingId) {
+      try{
+          Optional<Booking> booking = bookingRepository.findById(bookingId);
+          if(booking == null){
+              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking ", null));
+          }
+          return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking!", convertoBookingReponse(booking.get())));
+      }catch (Exception e){
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+      }
     }
 
     @Override

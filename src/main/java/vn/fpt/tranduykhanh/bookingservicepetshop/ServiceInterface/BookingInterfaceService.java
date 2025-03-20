@@ -10,9 +10,16 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 public interface BookingInterfaceService {
     ResponseEntity<ResponseObj> createBooking(BookingDTO bookingDTO, HttpServletRequest httpServletRequest);
 
-    ResponseEntity<ResponseObj> getBookingById(Long bookingId, HttpServletRequest request);
+    ResponseEntity<ResponseObj> getBookingByIdByUser(Long bookingId, HttpServletRequest request);
+
+    ResponseEntity<ResponseObj> getBookingDetailByUser(Long bookingId, HttpServletRequest request);
+
+    ResponseEntity<ResponseObj> getBookingDetailByAdmin(Long bookingId);
+
+    ResponseEntity<ResponseObj> getBookingByIdByAdmin(Long bookingId);
 
     ResponseEntity<ResponseObj> getAllBookingByUser(HttpServletRequest request);
+
 
     ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
 
