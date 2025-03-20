@@ -18,6 +18,8 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.request.UserDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.UserImplement;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -53,16 +55,30 @@ public class UserController {
         return userService.setUserRole(userId, roleEnum);
      }
 
-    @PostMapping(value = "/v1/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> signUp(@RequestParam("name") String userName,
-                                              @RequestParam("email") String email,
-                                              @RequestParam("phone") String phone,
-                                              @RequestParam("password") String password,
-                                              @RequestParam("address") String adress,// Nhận JSON dạng form-data
-                                              @RequestParam(value = "file", required = false) MultipartFile userImageFile){
-        UserDTO userDTO = new UserDTO(userName, email, phone, password, adress, userImageFile);
-        return userService.signUpByUserNameAndPassword(userDTO);
+    @PostMapping(value = "/v1/signup", consumes = "multipart/form-data")
+    public ResponseEntity<ResponseObj> signUp(@RequestPart(value = "user_name_account", required = false) String userName,
+                                              @RequestPart(value = "fullname", required = false) String fullName,
+                                              @RequestPart(value = "email", required = false) String email,
+                                              @RequestPart(value = "phone", required = false) String phone,
+                                              @RequestPart(value = "password", required = false) String password,
+                                              @RequestPart(value = "address", required = false) String adress,// Nhận JSON dạng form-data
+                                              @RequestPart(value = "file", required = false) MultipartFile userImageFile){
+        try {
+            UserDTO userDTO = new UserDTO(userName, fullName,email, phone, password, adress, userImageFile);
+            return userService.signUpByUserNameAndPassword(userDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Sai định dạng ảnh", null));
+        }
     }
+
+//    @DeleteMapping("/deleteAll")
+//    public String deleteAll(){
+//        if(userService.DeleteAll()){
+//            return "Xóa hết tài khoản thành công!";
+//        }
+//        return "Xóa thất bại";
+//    }
 
     @GetMapping("hello")
     public String a(){
@@ -76,13 +92,13 @@ public class UserController {
 
     @PutMapping(value = "/v1/updateUserProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> updateUserById(HttpServletRequest request,
-                                                      @RequestParam("name") String userName,
-                                                      @RequestParam("email") String email,
-                                                      @RequestParam("phone") String phone,
-                                                      @RequestParam("password") String password,
-                                                      @RequestParam("address") String adress,// Nhận JSON dạng form-data
-                                                      @RequestParam(value = "file", required = false) MultipartFile userImageFile){
-            UserDTO userDTO = new UserDTO(userName, email, phone, password, adress, userImageFile);
+                                                      @RequestPart(value = "fullname", required = false) String fullName,
+                                                      @RequestPart(value = "email", required = false) String email,
+                                                      @RequestPart(value = "phone", required = false) String phone,
+                                                      @RequestPart(value = "password", required = false) String password,
+                                                      @RequestPart(value = "address", required = false) String adress,// Nhận JSON dạng form-data
+                                                      @RequestPart(value = "file", required = false) MultipartFile userImageFile){
+            UserDTO userDTO = new UserDTO(fullName, email, phone, password, adress, userImageFile);
             return userService.updateUserProfile(request, userDTO);
     }
     @PutMapping("/v1/banAccountById/{userId}")

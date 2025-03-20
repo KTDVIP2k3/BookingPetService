@@ -12,6 +12,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ServiceResponse;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,24 +57,44 @@ public class ServiceImplement implements ServiceInterface {
     public ResponseEntity<ResponseObj> createService(ServiceDTO serviceDTO, MultipartFile serviceImageFile) {
         try {
             PetService service = new PetService();
-            service.setServiceName(serviceDTO.getServiceName()); // Lấy từ DTO
-            service.setDescription(serviceDTO.getServiceDescription()); // Lấy từ DTO
-            service.setPrice(serviceDTO.getServicePrice()); // Lấy từ DTO
+            if(serviceDTO.getServiceDescription().isEmpty() || serviceDTO.getServiceDescription() == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Description không được để trống!", null));
+            }
+            if(serviceDTO.getServiceName().isEmpty() || serviceDTO.getServiceName() == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service name không được để trống!", null));
+            }
+            if(serviceDTO.getServicePrice() <= 0){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service  price phải lớn hơn 0!", null));
+            }
+
+            try{
+                service.setServiceName(serviceDTO.getServiceName()); // Lấy từ DTO
+                service.setDescription(serviceDTO.getServiceDescription()); // Lấy từ DTO
+                service.setPrice(serviceDTO.getServicePrice()); // Lấy từ DTO
 //            if(service.getImageServiceBase64() == null){
 //                service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
 //            }
 //            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceDTO.getImageService()));
 
-            if(serviceImageFile == null){
-                service.setImageServiceBase64(null);
-            }
-            service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
-            service.setCreateAt(LocalDateTime.now());
-            service.setActive(true);
-            serviceRepository.save(service);
+               try{
+                   if(serviceImageFile == null){
+                       service.setImageServiceBase64(null);
+                   }
+                   service.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+               }catch (IOException e){
+                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
+               }
 
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ResponseObj(HttpStatus.CREATED.toString(), "Tạo thành công", service));
+                service.setCreateAt(LocalDateTime.now());
+                service.setActive(true);
+                serviceRepository.save(service);
+
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(new ResponseObj(HttpStatus.CREATED.toString(), "Tạo thành công", service));
+            }catch (NumberFormatException e){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số",null));
+            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
@@ -87,6 +108,17 @@ public class ServiceImplement implements ServiceInterface {
         if (!existingServiceOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(),"Not found", null));
         }
+
+        if(serviceDTO.getServiceDescription() != null && !serviceDTO.getServiceDescription().isEmpty()){
+            existingServiceOpt.get().setDescription(serviceDTO.getServiceDescription());
+        }
+        if( serviceDTO.getServiceName() != null && !serviceDTO.getServiceName().isEmpty()) {
+            existingServiceOpt.get().setServiceName(serviceDTO.getServiceName());
+        }
+        if(serviceDTO.getServicePrice() > 0){
+           existingServiceOpt.get().setPrice(serviceDTO.getServicePrice());
+        }
+
         try{
 
             PetService existingService = existingServiceOpt.get();
@@ -94,21 +126,28 @@ public class ServiceImplement implements ServiceInterface {
             existingService.setDescription(serviceDTO.getServiceDescription());
             existingService.setPrice(serviceDTO.getServicePrice());
             existingService.setUpdateAt(LocalDateTime.now());
-            if(serviceImageFile == null){
-                existingService.setImageServiceBase64(null);
+            try{
+                if(serviceImageFile == null){
+                    existingService.setImageServiceBase64(null);
 
-            }else{
-                if(existingService.getImageServiceBase64() == null){
-                    existingService.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
                 }else{
-                    existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingService.getImageServiceBase64()));
+                    if(existingService.getImageServiceBase64() == null){
+                        existingService.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+                    }else{
+                        existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingService.getImageServiceBase64()));
+                    }
                 }
-            }
 
+            }catch (IOException e){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
+            }
 //            existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
             serviceRepository.save(existingService);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", convertServiceToServiceResponseById(id)));
-        }catch (Exception e){
+        } catch (NumberFormatException number){
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số",null));
+        } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(),null));
         }
     }

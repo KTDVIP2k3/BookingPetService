@@ -1,7 +1,9 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -45,22 +47,41 @@ public class ServiceController {
 //    }
 
     @Operation(summary = "Upload một file ảnh cho service")
-    @PostMapping(value = "/v1/createService", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> createService(@RequestParam("serviceNAme") String serviceName,
-                                                     @RequestParam("description") String serviceDescription,
-                                                     @RequestParam("price") double price,
-                                                     @RequestPart(value = "file", required = false) MultipartFile serviceImage){
-        ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price);
-        return serviceImplement.createService(serviceDTO, serviceImage);
+    @PostMapping(value = "/v1/createService", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseObj> createService(@RequestPart(value = "serviceName", required = false) String serviceName,
+                                                     @RequestPart(value = "description", required = false) String serviceDescription,
+                                                     @RequestPart(value = "price", required = false) String price,
+                                                     @RequestPart(value = "file", required = false) MultipartFile serviceImage,
+                                                     HttpServletRequest request){
+      try{
+          double price1 = Double.parseDouble(price);
+          ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
+          return serviceImplement.createService(serviceDTO, serviceImage);
+      }catch (NumberFormatException e){
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số",null));
+      }
     }
     @Operation(summary = "Update ảnh mới và xóa ảnh cũ")
     @PutMapping(value = "/v1/update/{serviceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> updateServiceById(@PathVariable Long serviceId,
-                                                         @RequestParam("serviceNAme") String serviceName,
-                                                         @RequestParam("description") String serviceDescription,
-                                                         @RequestParam("price") double price,
-                                                         @RequestParam(value = "file", required = false) MultipartFile serviceImageFile){
-        ServiceDTO serviceDTO = new ServiceDTO(serviceName,serviceDescription, price);
+                                                         @RequestPart(value = "serviceName", required = false) String serviceName,
+                                                         @RequestPart(value = "description", required = false) String serviceDescription,
+                                                         @RequestPart(value = "price", required = false) String price,
+                                                         @RequestPart(value = "file", required = false) MultipartFile serviceImageFile){
+        double price1 = 0;  // Mặc định gán price1 = 0 nếu không có giá trị từ request
+
+        if (price != null && !price.isEmpty()) {
+            try {
+                price1 = Double.parseDouble(price);
+                ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
+                return serviceImplement.updateService(serviceId, serviceDTO, serviceImageFile);
+            } catch (NumberFormatException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số", null));
+            }
+        }
+
+        ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
         return serviceImplement.updateService(serviceId, serviceDTO, serviceImageFile);
     }
 

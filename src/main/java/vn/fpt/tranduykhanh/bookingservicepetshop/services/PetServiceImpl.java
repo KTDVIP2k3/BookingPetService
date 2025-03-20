@@ -16,6 +16,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.PetReponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.utils.AuthenUtil;
 
+import java.io.IOException;
 import java.nio.channels.MulticastChannel;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,35 +42,63 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public ResponseEntity<ResponseObj> createPet(PetDTO petDTO, MultipartFile petImage, HttpServletRequest request) {
-        User user = userImplement.getUserByToken(request);
-        User user1 = authenUtil.getCurrentUSer();
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Người dùng không tồn tại", null));
-        }
-        Pet pet = new Pet();
-        if(petRepository.existsByPetName(petDTO.getPetName())){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Pet name has exist", null));
-        }
-        pet.setPetName(petDTO.getPetName());
-        pet.setPetType(petDTO.getPetTypeEnum());
-        pet.setPetGender(petDTO.getPetGenderEnum());
-        pet.setAge(petDTO.getAge());
-        pet.setNotes(petDTO.getNotes());
-        pet.setActive(true);
-        pet.setCreateAt(LocalDateTime.now());
-      try{
-          if(petImage == null){
-              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), " Image Cannot be null", null));
-          }
-          pet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
-      }catch (Exception e){
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
-      }
-        pet.setUser(user);
-        petRepository.save(pet);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseObj(HttpStatus.CREATED.toString(), "Thêm thú cưng thành công", convertPetToPetReponse(pet)));
+     try{
+         User user = userImplement.getUserByToken(request);
+         User user1 = authenUtil.getCurrentUSer();
+         if (user == null) {
+             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                     .body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Người dùng không tồn tại", null));
+         }
+         Pet pet = new Pet();
+//        if(petRepository.existsByPetName(petDTO.getPetName())){
+//            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Pet name has exist", null));
+//        }
+         if(petDTO.getPetName() == null || petDTO.getPetName().isEmpty()){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet name không được để trống", null));
+         }
+
+         if(petDTO.getPetTypeEnum() == null){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet type không được để trống", null));
+         }
+
+         if(petDTO.getPetGenderEnum() == null){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet gender không được để trống", null));
+         }
+
+         if(petDTO.getAge() <= 0){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age không được <= 0", null));
+         }
+
+         if(petDTO.getNotes() == null){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Notes không được để trống", null));
+         }
+
+         pet.setPetName(petDTO.getPetName());
+         pet.setPetType(petDTO.getPetTypeEnum());
+         pet.setPetGender(petDTO.getPetGenderEnum());
+         pet.setAge(petDTO.getAge());
+         pet.setNotes(petDTO.getNotes());
+         pet.setActive(true);
+         pet.setCreateAt(LocalDateTime.now());
+         try{
+             if(petImage == null){
+                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), " Image Cannot be null", null));
+             }
+             pet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
+         }catch (IOException e){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
+         }
+         pet.setUser(user);
+         petRepository.save(pet);
+         return ResponseEntity.status(HttpStatus.CREATED)
+                 .body(new ResponseObj(HttpStatus.CREATED.toString(), "Thêm thú cưng thành công", convertPetToPetReponse(pet)));
+     }
+     catch (NumberFormatException e){
+         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số nguyên", null));
+     }
+     catch (Exception e){
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.OK.toString(), e.toString(),null));
+     }
     }
 
     private PetReponse convertPetToPetReponse(Pet pet){
@@ -121,34 +150,51 @@ public class PetServiceImpl implements PetService {
     @Override
     public ResponseEntity<ResponseObj> updatePetByUser(Long petId, PetDTO petDTO, MultipartFile petImage, HttpServletRequest request) {
        try{
+           Pet existPet = petRepository.findById(petId).get();
            if(userImplement.getUserByToken(request) == null){
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Khong co tai khoan nay de cap nhat pet", null));
            }
-           Pet existPet = petRepository.findById(petId).get();
-           existPet.setPetName(petDTO.getPetName());
-           existPet.setPetType(petDTO.getPetTypeEnum());
-           existPet.setPetGender(petDTO.getPetGenderEnum());
-           existPet.setNotes(petDTO.getNotes());
-           existPet.setNotes(petDTO.getNotes());
+
+           if(petDTO.getPetName() != null && !petDTO.getPetName().isEmpty()) {
+               existPet.setPetName(petDTO.getPetName());
+           }
+
+           if(petDTO.getPetTypeEnum() != null) {
+               existPet.setPetType(petDTO.getPetTypeEnum());
+
+           }
+
+           if(petDTO.getPetGenderEnum() != null) {
+               existPet.setPetGender(petDTO.getPetGenderEnum());
+           }
+           if(petDTO.getAge() > 0) {
+               existPet.setAge(petDTO.getAge());
+           }
+
+           if(petDTO.getNotes() != null) {
+               existPet.setNotes(petDTO.getNotes());
+           }
+
            try{
-             if(petImage == null){
-                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Pet image cannot be null", null));
-             }else{
-                 if(existPet.getImagePetBase64() == null){
+               if(petImage != null){
+                   if(existPet.getImagePetBase64() == null){
 
-                     existPet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
+                       existPet.setImagePetBase64(uploadImageFileService.uploadImage(petImage));
 
-                 }else{
-                     existPet.setImagePetBase64(uploadImageFileService.updateImage(petImage, existPet.getImagePetBase64()));
-                 }
-             }
-           }catch (Exception e){
-               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+                   }else{
+                       existPet.setImagePetBase64(uploadImageFileService.updateImage(petImage, existPet.getImagePetBase64()));
+                   }
+               }
+           }catch (IOException e){
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
            }
            existPet.setUpdateAt(LocalDateTime.now());
            petRepository.save(existPet);
            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Cap nhat oet thanh cong", convertPetToPetReponse(existPet)));
-       }catch (Exception e){
+       }catch (NumberFormatException e){
+           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số nguyên", null));
+       }
+       catch (Exception e){
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
        }
     }

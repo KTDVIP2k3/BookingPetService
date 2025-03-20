@@ -26,6 +26,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.UserResponse;
 import vn.fpt.tranduykhanh.bookingservicepetshop.utils.AuthenUtil;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,26 +134,53 @@ public class UserImplement implements UserInterface {
                     .body(new ResponseObj(HttpStatus.CONFLICT.toString(), "User name exists", false));
         }
 
+        if(userDTO.getUserName() == null || userDTO.getUserName().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "tên tài khoản user name không được để trống!", null));
+        }
         // Kiểm tra password null hoặc rỗng
         if (userDTO.getPassword() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Password cannot be null or empty", false));
+                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "password không được để trống", false));
+        }
+
+        if(userDTO.getFullName() == null || userDTO.getFullName().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "full name không được để trống!", null));
+        }
+
+        if(userDTO.getPassword() == null || userDTO.getPassword().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Password không được để trống!", null));
+        }
+
+        if(userDTO.getPhone() == null || userDTO.getPhone().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "số điện thoại không được để trống!", null));
+        }
+
+        if(userDTO.getAddress() == null || userDTO.getAddress().isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Địa chỉ không được để trống!", null));
+        }
+
+        if(userDTO.getUserImageFile() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Image không được để trống!", null));
         }
 
         try {
             User user = new User();
 //            Role role = roleRepository.findByRoleName(RoleEnum.ADMIN);
 
+
             user.setUserName(userDTO.getUserName());
+            user.setFullName(userDTO.getFullName());
             user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Mã hóa mật khẩu
             user.setEmail(userDTO.getEmail());
             user.setPhone(userDTO.getPhone());
             user.setAddress(userDTO.getAddress());
-            if(userDTO.getUserImageFile() != null){
-                user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
-            }
-
-            user.setAvatarBase64(null);
+           try{
+               if(userDTO.getUserImageFile() != null){
+                   user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
+               }
+           }catch (IOException e){
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
+           }
             user.setRole(roleRepository.findByRoleName(RoleEnum.CUSTOMER));
             user.setActive(true);
             user.setCreateAt(LocalDateTime.now());
@@ -170,7 +198,7 @@ public class UserImplement implements UserInterface {
     public UserResponse convertUserToUserResponse(User user){
         if(user == null)
             return null;
-        UserResponse userResponse = new UserResponse(user.getId(),user.getUserName(),user.getEmail(),user.getPhone(),user.getAddress(),user.isActive(),user.getAvatarBase64());
+        UserResponse userResponse = new UserResponse(user.getId(),user.getUserName(),user.getFullName(),user.getEmail(),user.getPhone(),user.getAddress(),user.isActive(),user.getAvatarBase64());
         return userResponse;
     }
 
@@ -209,30 +237,49 @@ public class UserImplement implements UserInterface {
     public ResponseEntity<ResponseObj> updateUserProfile(HttpServletRequest request, UserDTO userDTO) {
         User user = getUserByToken(request);
 //        Role role = roleRepository.findByRoleName(RoleEnum.CUSTOMER);
-        if(user == null){
-
+//        if(userDTO.getUserName() == null || userDTO.getUserName().isEmpty()){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "tên tài khoản user name không được để trống!", null));
+//        }
+        // Kiểm tra password null hoặc rỗng
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-        User user1 = user;
-        user1.setUserName(userDTO.getUserName());
-        user1.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user1.setEmail(userDTO.getEmail());
-        user1.setAddress(userDTO.getAddress());
-      if(userDTO.getUserImageFile() == null){
-          user1.setAvatarBase64(null);
-      }else{
-          try {
-              if(user.getAvatarBase64() == null){
-                  user1.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
-              }else{
-                  user1.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
+
+        if(userDTO.getFullName() != null && !userDTO.getFullName().isEmpty()){
+            user.setFullName(userDTO.getFullName());
+        }
+
+        if(userDTO.getPhone() != null && !userDTO.getPhone().isEmpty()){
+            user.setPhone(userDTO.getPhone());
+        }
+
+        if(userDTO.getAddress() != null && !userDTO.getAddress().isEmpty()) {
+            user.setAddress(userDTO.getAddress());
+        }
+
+        if(userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()){
+            user.setEmail(userDTO.getEmail());
+        }
+
+
+      if(userDTO.getUserImageFile() != null){
+          if(userDTO.getUserImageFile() == null){
+              user.setAvatarBase64(null);
+          }else{
+              try {
+                  if(user.getAvatarBase64() == null){
+                      user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
+                  }else{
+                      user.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
+                  }
+              }catch (IOException e){
+                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
               }
-          }catch (Exception e){
-              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
           }
       }
-        user1.setUpdateAt(LocalDateTime.now());
-        userRepository.save(user1);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update Succesfully", convertUserToUserResponse(user1)));
+        user.setUpdateAt(LocalDateTime.now());
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update Succesfully", convertUserToUserResponse(user)));
     }
 
     @Override
@@ -261,6 +308,15 @@ public class UserImplement implements UserInterface {
        }catch (Exception e){
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.OK.toString(), e.toString(),null));
        }
+    }
+
+    public boolean DeleteAll(){
+        try{
+            userRepository.deleteAll();
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     @Override

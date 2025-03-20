@@ -2,6 +2,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +20,21 @@ public class PetController {
     private PetService petService;
 
     @PostMapping(value = "/v1/createPet", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> createPet(@RequestParam("petName") String petName,
-                                                 @RequestParam("petType") PetTypeEnum petType,
-                                                 @RequestParam("petGender") PetGenderEnum petGender,
-                                                 @RequestParam("petAge") int petAge,
-                                                 @RequestParam("note") String note,
-                                                 @RequestParam(value = "file", required = false) MultipartFile petImage,
+    public ResponseEntity<ResponseObj> createPet(@RequestPart(value = "petName", required = false) String petName,
+                                                 @RequestPart(value = "petType", required = false) PetTypeEnum petType,
+                                                 @RequestPart(value = "petGender", required = false) PetGenderEnum petGender,
+                                                 @RequestPart(value = "petAge", required = false) String petAge,
+                                                 @RequestPart(value = "note", required = false) String note,
+                                                 @RequestPart(value = "file", required = false) MultipartFile petImage,
                                                  HttpServletRequest request) {
-        PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge, note);
-       return petService.createPet(petDTO,petImage, request);
+        try{
+            int petAge1 = Integer.parseInt(petAge);
+            PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
+            return petService.createPet(petDTO,petImage, request);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số", null));
+        }
     }
 
     @GetMapping("/v1/getPetListOfUser")
@@ -42,18 +49,28 @@ public class PetController {
 
     @PutMapping(value = "/v1/updatePet/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseObj> updatePet(@PathVariable Long petId,
-                                                 @RequestParam("petName") String petName,
-                                                 @RequestParam("petType") PetTypeEnum petType,
-                                                 @RequestParam("petGender") PetGenderEnum petGender,
-                                                 @RequestParam("petAge") int petAge,
-                                                 @RequestParam("note") String note,
-                                                 @RequestParam(value = "file", required = false) MultipartFile petImage,
+                                                 @RequestPart(value = "petName", required = false) String petName,
+                                                 @RequestPart(value = "petType", required = false) PetTypeEnum petType,
+                                                 @RequestPart(value = "petGender", required = false) PetGenderEnum petGender,
+                                                 @RequestPart(value = "petAge", required = false) String petAge,
+                                                 @RequestPart(value = "note", required = false) String note,
+                                                 @RequestPart(value = "file", required = false) MultipartFile petImage,
                                                  HttpServletRequest request){
-        PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge, note);
+        int petAge1 = 0;
+       if(petAge != null && !petAge.isEmpty()){
+           try{
+               petAge1 = Integer.parseInt(petAge);
+               PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
+               return petService.updatePetByUser(petId,petDTO,petImage, request);
+           }catch (NumberFormatException number){
+               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Pet age phải là số",null));
+           }
+       }
+        PetDTO petDTO = new PetDTO(petName, petType, petGender, petAge1, note);
         return petService.updatePetByUser(petId,petDTO,petImage, request);
     }
 
-    @DeleteMapping("/deletPetOfUserById/{petId}")
+    @DeleteMapping("/deletePetOfUserById/{petId}")
     public ResponseEntity<ResponseObj> deletePet(@PathVariable Long petId, HttpServletRequest request) {
         return petService.deletePetByUser(petId, request);
     }
