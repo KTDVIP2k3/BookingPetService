@@ -121,20 +121,16 @@ public class ServiceImplement implements ServiceInterface {
 
         try{
 
-            PetService existingService = existingServiceOpt.get();
-            existingService.setServiceName(serviceDTO.getServiceName());
-            existingService.setDescription(serviceDTO.getServiceDescription());
-            existingService.setPrice(serviceDTO.getServicePrice());
-            existingService.setUpdateAt(LocalDateTime.now());
+            existingServiceOpt.get().setUpdateAt(LocalDateTime.now());
             try{
                 if(serviceImageFile == null){
-                    existingService.setImageServiceBase64(null);
+                    existingServiceOpt.get().setImageServiceBase64(null);
 
                 }else{
-                    if(existingService.getImageServiceBase64() == null){
-                        existingService.setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+                    if(existingServiceOpt.get().getImageServiceBase64() == null){
+                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
                     }else{
-                        existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingService.getImageServiceBase64()));
+                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingServiceOpt.get().getImageServiceBase64()));
                     }
                 }
 
@@ -142,7 +138,7 @@ public class ServiceImplement implements ServiceInterface {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
             }
 //            existingService.setImageServiceBase64(uploadImageFileService.updateImage(serviceDTO.getImageService(),existingService.getImageServiceBase64()));
-            serviceRepository.save(existingService);
+            serviceRepository.save(existingServiceOpt.get());
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(),"Service updated successfully", convertServiceToServiceResponseById(id)));
         } catch (NumberFormatException number){
 

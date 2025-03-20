@@ -293,7 +293,6 @@ public class OrderController {
         } else {
             booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
         }
-        
 //        else {
 //            orderReponse.setPaymentLinkData(paymentLinkData);
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), orderReponse.getPaymentLinkData().getStatus(), null));
