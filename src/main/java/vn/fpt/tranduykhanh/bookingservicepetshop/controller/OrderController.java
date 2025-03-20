@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
@@ -204,6 +205,7 @@ public class OrderController {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), null));
        }
 
+       booking.setBookingStatus(BookingStatus.CANCELLED);
        booking.setBookingStatusPaid(BookingStatusPaid.UNPAID);
 
        try{
@@ -288,12 +290,14 @@ public class OrderController {
             if(booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC){
                 booking.setBookingStatusPaid(BookingStatusPaid.DEPOSIT);
             }
-        } else if ("FAILED".equalsIgnoreCase(paymentLinkData.getStatus())) {
-            booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
         } else {
-            orderReponse.setPaymentLinkData(paymentLinkData);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), orderReponse.getPaymentLinkData().getStatus(), null));
+            booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
         }
+        
+//        else {
+//            orderReponse.setPaymentLinkData(paymentLinkData);
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), orderReponse.getPaymentLinkData().getStatus(), null));
+//        }
 
         try{
             bookingRepository.save(booking);
