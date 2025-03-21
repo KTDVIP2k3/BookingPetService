@@ -102,8 +102,8 @@ public class PetServiceImpl implements PetService {
     }
 
     private PetReponse convertPetToPetReponse(Pet pet){
-        if(petRepository.findByPetName(pet.getPetName()) == null )
-            return null;
+//        if(petRepository.findByPetName(pet.getPetName()) == null )
+//            return null;
         return new PetReponse(pet.getId(),pet.getPetName(),pet.getPetType(), pet.getPetGender(), pet.getAge(), pet.getImagePetBase64(), pet.getNotes());
     }
 
@@ -174,6 +174,10 @@ public class PetServiceImpl implements PetService {
            if(petDTO.getNotes() != null) {
                existPet.setNotes(petDTO.getNotes());
            }
+           if(!existPet.getBookingList().isEmpty()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                          .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertPetToPetReponse(existPet)));
+           }
 
            try{
                if(petImage != null){
@@ -211,6 +215,12 @@ public class PetServiceImpl implements PetService {
                return ResponseEntity.status(HttpStatus.NOT_FOUND)
                        .body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Không tìm thấy thú cưng", null));
            }
+
+           if(!petOpt.get().getBookingList().isEmpty()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                          .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể xóa thú cưng đã được đặt lịch", null));
+           }
+
            uploadImageFileService.deleteImage(petOpt.get().getImagePetBase64());
            petRepository.deleteById(petId);
            return ResponseEntity.status(HttpStatus.OK)
