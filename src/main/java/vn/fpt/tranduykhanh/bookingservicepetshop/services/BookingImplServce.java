@@ -75,7 +75,7 @@ public class BookingImplServce implements BookingInterfaceService {
            booking.setLocalDate(bookingDTO.getLocalDate());
            booking.setService(serviceOpt.get());
            booking.setPayment(paymentOpt.get());
-           booking.setBookingStatus(BookingStatus.PENDING);
+           booking.setBookingStatus(BookingStatus.NOTYET);
            booking.setActive(true);
            booking.setCreateAt(LocalDateTime.now());
 //           if(paymentOpt.get().getPaymentMethodName() == PaymentMethodEnum.THANH_TOAN_TOAN_BO){

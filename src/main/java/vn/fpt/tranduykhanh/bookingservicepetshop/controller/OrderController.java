@@ -97,6 +97,14 @@ public class OrderController {
             }
             numberPayment = (int)booking.getService().getPrice();
 
+            if(booking.getBookingStatusPaid() == BookingStatusPaid.PAIDALL || booking.getBookingStatusPaid() == BookingStatusPaid.DEPOSIT){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking này đã trả rồi", bookingImplServce.convertoBookingReponse(booking)));
+            }
+
+            if(booking.getBookingStatus() == BookingStatus.CANCELLED){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking này đã cancel", bookingImplServce.convertoBookingReponse(booking)));
+            }
+
 
             if (numberPayment <= 0) {
                 logger.error("Lỗi: Giá trị amount không hợp lệ ({})", numberPayment);
@@ -140,10 +148,10 @@ public class OrderController {
 //                    .build();
 
 //            bookingpetservice.onrender.com
-                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode)
-//                    .returnUrl("https://exe-201-web.vercel.app")
-//                    .cancelUrl("https://exe-201-web.vercel.app")
-                    .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode)
+                    .returnUrl("https://exe-201-web.vercel.app")
+                    .cancelUrl("https://exe-201-web.vercel.app")
+//                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode)
+//                    .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode)
 
                     .build();
 
@@ -301,9 +309,11 @@ public class OrderController {
         if ("PAID".equalsIgnoreCase(paymentLinkData.getStatus())) {
             if (booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.THANH_TOAN_TOAN_BO){
                 booking.setBookingStatusPaid(BookingStatusPaid.PAIDALL);
+                booking.setBookingStatus(BookingStatus.PENDING);
             }
             if(booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC){
                 booking.setBookingStatusPaid(BookingStatusPaid.DEPOSIT);
+                booking.setBookingStatus(BookingStatus.PENDING);
             }
         } else {
             booking.setBookingStatusPaid(BookingStatusPaid.FAILED);
