@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.Payment;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
@@ -52,6 +53,7 @@ public class OrderController {
     @Autowired
     TransactionServiceImple transactionServiceImple;
 
+
     public OrderController(PayOS payOS) {
         this.payos = payOS;
     }
@@ -76,6 +78,8 @@ public class OrderController {
 
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(),e.getMessage(),null));
        }
+
+
 
         try {
             // Lấy bookingId từ request
@@ -111,6 +115,12 @@ public class OrderController {
                 decription =  "Thanh toán toàn bộ";
                 logger.info("Description: {}", decription);
             }
+                PaymentLinkData paymentLinkData = new PaymentLinkData();
+                paymentLinkData.setId(String.valueOf(orderCode));
+                paymentLinkData.setBooking(booking);
+                paymentLinkData.setOrderCode(orderCode);
+                paymentLinkDataServiceIpml.createPaymentLinkData2(paymentLinkData);
+
             List<ItemData> itemDataList = new ArrayList<>();
             ItemData itemData = ItemData.builder().name(booking.getService().getServiceName()).quantity(1).price((int)booking.getService().getPrice()).build();
             itemDataList.add(itemData);
@@ -130,8 +140,11 @@ public class OrderController {
 //                    .build();
 
 //            bookingpetservice.onrender.com
-                    .returnUrl("https://exe-201-web.vercel.app") // Gửi bookingId về
-                    .cancelUrl("https://exe-201-web.vercel.app")
+                    .returnUrl("http://localhost:8080/api/payment/order?orderCode=" + orderCode)
+//                    .returnUrl("https://exe-201-web.vercel.app")
+//                    .cancelUrl("https://exe-201-web.vercel.app")
+                    .cancelUrl("http://localhost:8080/api/payment/cancel?orderCode=" + orderCode)
+
                     .build();
 
             // Gọi PayOS để tạo link thanh toán
@@ -164,14 +177,17 @@ public class OrderController {
 //        return ResponseEntity.ok("Cancel successful: orderCode=" + orderCode + ", bookingId=" + bookingId);
 //    }
 
+//
+//    @RequestParam("bookingId") Long bookingId
     @GetMapping("/cancel")
-    public ResponseEntity<ResponseObj> cancelPayment(@RequestParam("orderCode") String orderCode,
-                                                     @RequestParam("bookingId") Long bookingId) throws Exception {
-        Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
+    public ResponseEntity<ResponseObj> cancelPayment(@RequestParam("orderCode") String orderCode) throws Exception {
+//        Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
+
+        Booking booking = bookingImplServce.getBookingByOrderCode(orderCode);
 
         vn.payos.type.PaymentLinkData paymentLinkData = payos.cancelPaymentLink(Long.parseLong(orderCode), "Huy don hang" );
 
-        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking.getPayment(), paymentLinkData);
+        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking, paymentLinkData);
 
         try{
             paymentLinkDataServiceIpml.createPaymentLinkData(paymentLinkDataDTO);
@@ -240,14 +256,13 @@ public class OrderController {
     }
 
     @GetMapping("/order")
-    public ResponseEntity<ResponseObj> paymentStatus(@RequestParam("orderCode") String orderCode,
-                                                    @RequestParam("bookingId") Long bookingId) throws Exception {
+    public ResponseEntity<ResponseObj> paymentStatus(@RequestParam("orderCode") String orderCode) throws Exception {
 
-        Booking booking = bookingImplServce.getBookingByIdV2(bookingId);
+        Booking booking = bookingImplServce.getBookingByOrderCode(orderCode);
 
         vn.payos.type.PaymentLinkData paymentLinkData = payos.getPaymentLinkInformation(Long.parseLong(orderCode));
 
-        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking.getPayment(), paymentLinkData);
+        PaymentLinkDataDTO paymentLinkDataDTO = new PaymentLinkDataDTO(booking, paymentLinkData);
 
         try{
             paymentLinkDataServiceIpml.createPaymentLinkData(paymentLinkDataDTO);

@@ -186,6 +186,19 @@ public class BookingImplServce implements BookingInterfaceService {
       }
     }
 
+    public Booking getBookingByOrderCode(String orderCode) {
+        Long order1 = Long.parseLong(orderCode);
+        List<Booking> bookingList = bookingRepository.findAll();
+        for(Booking booking : bookingList){
+           for(PaymentLinkData paymentLinkData : booking.getPaymentLinkData()){
+                if(paymentLinkData.getOrderCode() == order1){
+                     return booking;
+                }
+           }
+        }
+        return null;
+    }
+
     @Override
     public ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request) {
         try {

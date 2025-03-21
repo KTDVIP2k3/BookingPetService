@@ -16,9 +16,9 @@ import java.util.List;
 public class PaymentLinkData {
 
     @ManyToOne
-    @JoinColumn(name = "payment_id")
+    @JoinColumn(name = "booking_id")
     @JsonIgnore
-    private Payment payment;
+    private Booking booking;
 
     @Id
     private String id; // ID link thanh toán

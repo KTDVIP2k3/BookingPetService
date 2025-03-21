@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PaymnetLinkDataServiceInterface;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentLinkDataRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentRepository;
@@ -22,10 +23,23 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
     @Autowired
     private PaymentRepository paymentRepository;
 
+    public void createPaymentLinkData2(PaymentLinkData paymentLinkData){
+        paymentLinkDataRepository.save(paymentLinkData);
+    }
+
     @Override
     public void createPaymentLinkData(PaymentLinkDataDTO paymentLinkDataDTO) {
 //        try {
             PaymentLinkData paymentLinkDatnLinkData = new PaymentLinkData();
+            Booking booking = paymentLinkDataDTO.getBooking();
+            List<PaymentLinkData> paymentLinkDataList = paymentLinkDataDTO.getBooking().getPaymentLinkData();
+            for(PaymentLinkData paymentLinkData1 : paymentLinkDataList){
+                if(paymentLinkData1.getOrderCode() == paymentLinkDataDTO.getPaymentLinkData().getOrderCode()){
+                    paymentLinkData1.setBooking(null);
+                    paymentLinkDataRepository.save(paymentLinkData1);
+                    paymentLinkDataRepository.delete(paymentLinkData1);
+                }
+            }
 
 //            if (paymentLinkDataDTO.getPayment() == null) {
 //                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Payment does not exist", null));
@@ -33,7 +47,7 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
 
             paymentLinkDatnLinkData.setId(paymentLinkDataDTO.getPaymentLinkData().getId());
 
-            paymentLinkDatnLinkData.setPayment(paymentLinkDataDTO.getPayment());
+            paymentLinkDatnLinkData.setBooking(paymentLinkDataDTO.getBooking());
 
             paymentLinkDatnLinkData.setAmount(paymentLinkDataDTO.getPaymentLinkData().getAmount());
 

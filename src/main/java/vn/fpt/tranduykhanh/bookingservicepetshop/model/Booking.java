@@ -7,6 +7,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,6 +38,9 @@ public class Booking extends BaseEntity{
     @JoinColumn(name = "service_id")
 //    @JsonIgnore  // Ngăn vòng lặp khi serialize JSON
     private PetService service;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentLinkData> paymentLinkData;
 
     @ManyToOne
     @JoinColumn(name = "payment_id")

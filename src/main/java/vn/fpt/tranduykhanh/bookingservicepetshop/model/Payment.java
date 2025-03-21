@@ -23,7 +23,7 @@ public class Payment extends BaseEntity{
     @JsonIgnore
     private List<Booking> bookingList;
 
-    @OneToMany(mappedBy = "payment")
-    @JsonIgnore
-    private List<PaymentLinkData> paymentLinkData;
+//    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JsonIgnore
+//    private List<PaymentLinkData> paymentLinkData;
 }
