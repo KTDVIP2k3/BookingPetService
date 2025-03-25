@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.BookingInterfaceService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetService;
@@ -76,6 +77,7 @@ public class BookingImplServce implements BookingInterfaceService {
            booking.setService(serviceOpt.get());
            booking.setPayment(paymentOpt.get());
            booking.setBookingStatus(BookingStatus.NOTYET);
+           booking.setBookingStatusPaid(BookingStatusPaid.UNPAID);
            booking.setActive(true);
            booking.setCreateAt(LocalDateTime.now());
 //           if(paymentOpt.get().getPaymentMethodName() == PaymentMethodEnum.THANH_TOAN_TOAN_BO){
