@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PetService;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Pet;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.User;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PetRepository;
@@ -174,10 +176,17 @@ public class PetServiceImpl implements PetService {
            if(petDTO.getNotes() != null) {
                existPet.setNotes(petDTO.getNotes());
            }
+
            if(!existPet.getBookingList().isEmpty()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                          .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertPetToPetReponse(existPet)));
+               for(Booking booking : existPet.getBookingList()){
+                   if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET){
+                       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                               .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertPetToPetReponse(existPet)));
+                   }
+               }
            }
+
+
 
            try{
                if(petImage != null){

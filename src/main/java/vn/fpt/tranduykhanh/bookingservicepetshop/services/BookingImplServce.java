@@ -95,7 +95,7 @@ public class BookingImplServce implements BookingInterfaceService {
        }
     }
 
-    public BookingReponse convertoBookingReponse(Booking booking){
+    public BookingReponse   convertoBookingReponse(Booking booking){
         BookingReponse bookingReponse = new BookingReponse(booking.getId(),booking.getUser().getFullName(), booking.getService().getServiceName(), booking.getPet().getPetName(), booking.getLocalDate(), booking.getBookingStatus(), booking.getBookingStatusPaid());
         return bookingReponse;
     }
@@ -204,7 +204,6 @@ public class BookingImplServce implements BookingInterfaceService {
         try {
             List<BookingReponse> bookingReponseList = new ArrayList<>();
 
-            // Lấy tất cả booking từ database
             List<Booking> bookingList = bookingRepository.findAll();
 
             for (Booking booking : bookingList) {

@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.ServiceInterface;
+import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PetService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.ServiceRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
@@ -121,6 +123,13 @@ public class ServiceImplement implements ServiceInterface {
         }
         if(serviceDTO.getServicePrice() > 0){
            existingServiceOpt.get().setPrice(serviceDTO.getServicePrice());
+        }
+
+        for(Booking booking : existingServiceOpt.get().getBookingList()){
+            if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertServiceToServiceResponseById(existingServiceOpt.get().getId())));
+            }
         }
 
         try{
