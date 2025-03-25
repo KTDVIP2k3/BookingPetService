@@ -111,9 +111,6 @@ public class ServiceImplement implements ServiceInterface {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(),"Not found", null));
         }
 
-        if(!existingServiceOpt.get().getBookingList().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),"Service này đang có booking", convertServiceToServiceResponseById(existingServiceOpt.get().getId())));
-        }
 
         if(serviceDTO.getServiceDescription() != null && !serviceDTO.getServiceDescription().isEmpty()){
             existingServiceOpt.get().setDescription(serviceDTO.getServiceDescription());
@@ -126,7 +123,7 @@ public class ServiceImplement implements ServiceInterface {
         }
 
         for(Booking booking : existingServiceOpt.get().getBookingList()){
-            if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET){
+            if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET || booking.getBookingStatus() == BookingStatus.COMPLETED){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật service vi dang duoc su dung", convertServiceToServiceResponseById(existingServiceOpt.get().getId())));
             }
@@ -178,9 +175,14 @@ public class ServiceImplement implements ServiceInterface {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(),"Service not found", null));
         }
 
-        if(!serviceOpt.get().getBookingList().isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),"Service này đang có booking", null));
+
+        for(Booking booking : serviceOpt.get().getBookingList()){
+            if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET || booking.getBookingStatus() == BookingStatus.COMPLETED){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể xoa service vi dang duoc su dung", convertServiceToServiceResponseById(serviceOpt.get().getId())));
+            }
         }
+
 
         serviceRepository.delete(serviceOpt.get());
 //        serviceOpt.get().setActive(false);

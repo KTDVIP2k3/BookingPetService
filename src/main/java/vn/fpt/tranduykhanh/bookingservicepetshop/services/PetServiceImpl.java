@@ -179,7 +179,7 @@ public class PetServiceImpl implements PetService {
 
            if(!existPet.getBookingList().isEmpty()){
                for(Booking booking : existPet.getBookingList()){
-                   if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET){
+                   if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET || booking.getBookingStatus() == BookingStatus.COMPLETED){
                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertPetToPetReponse(existPet)));
                    }
@@ -226,9 +226,15 @@ public class PetServiceImpl implements PetService {
            }
 
            if(!petOpt.get().getBookingList().isEmpty()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                          .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể xóa thú cưng đã được đặt lịch", null));
+               for(Booking booking : petOpt.get().getBookingList()){
+                   if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET || booking.getBookingStatus() == BookingStatus.COMPLETED){
+                       return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                               .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể xoa thú cưng đã được đặt lịch va dang su dung dich vu", convertPetToPetReponse(petOpt.get())));
+                   }
+               }
            }
+
+
 
            uploadImageFileService.deleteImage(petOpt.get().getImagePetBase64());
            petRepository.deleteById(petId);
