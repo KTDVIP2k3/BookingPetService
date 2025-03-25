@@ -2,6 +2,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.config;
 
 
 import com.cloudinary.Cloudinary;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,12 +12,22 @@ import java.util.Map;
 @Configuration
 public class ConfigCondinary {
 
+
+    @Value("${cloudinary.cloud-name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api-key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api-secret}")
+    private String apiSecret;
+
     @Bean
     public Cloudinary configKey(){
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", "dky9dvlho");
-        config.put("api_key", "297991486574694");
-        config.put("api_secret", "olb0LiQ8wmu7uJkCkYMsfxbEeUc");
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
         return new Cloudinary(config);
     }
 }
