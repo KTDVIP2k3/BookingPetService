@@ -128,7 +128,7 @@ public class ServiceImplement implements ServiceInterface {
         for(Booking booking : existingServiceOpt.get().getBookingList()){
             if(booking.getBookingStatus() != BookingStatus.CANCELLED || booking.getBookingStatus() != BookingStatus.NOTYET){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật thú cưng đã được đặt lịch", convertServiceToServiceResponseById(existingServiceOpt.get().getId())));
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Không thể cập nhật service vi dang duoc su dung", convertServiceToServiceResponseById(existingServiceOpt.get().getId())));
             }
         }
 
