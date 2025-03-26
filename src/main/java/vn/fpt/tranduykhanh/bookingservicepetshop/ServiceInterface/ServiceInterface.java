@@ -8,6 +8,10 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 public interface ServiceInterface {
     public ResponseEntity<ResponseObj> getServiceAllIsActive();
 
+    public ResponseEntity<ResponseObj> getServiceAllByAdmin();
+
+    public ResponseEntity<ResponseObj> getServiceByIdByAdmin(Long id);
+
     public ResponseEntity<ResponseObj> getServiceByIdIsActive(Long id);
 
     public ResponseEntity<ResponseObj> createService(ServiceDTO serviceDTO, MultipartFile serviceImageFile);

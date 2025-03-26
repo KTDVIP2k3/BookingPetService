@@ -6,39 +6,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import vn.fpt.tranduykhanh.bookingservicepetshop.request.OptinalServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.ServiceDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
-import vn.fpt.tranduykhanh.bookingservicepetshop.services.PetServiceImpl;
+import vn.fpt.tranduykhanh.bookingservicepetshop.services.PetOptinalServiceImplement;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.ServiceImplement;
 
 @RestController
-@RequestMapping("/api/service")
-public class ServiceController {
+@RequestMapping("/api/OptionalService")
+public class OptinalServiceController {
     @Autowired
-    private ServiceImplement serviceImplement;
+    private PetOptinalServiceImplement serviceImplement;
 
-    @GetMapping(value = "/v1/getAllServiceIsActive", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/v1/getAllOptionalServiceIsActive", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseObj> getAllSerivceIsActive(){
-        return serviceImplement.getServiceAllIsActive();
+        return serviceImplement.getOptionalServiceAllIsActive();
     }
 
-    @GetMapping(value = "/v1/getAllServiceByAdmin")
-    public  ResponseEntity<ResponseObj> getAllServiceByAdmin(){
-        return  serviceImplement.getServiceAllByAdmin();
-    }
+//    @GetMapping(value = "/v1/getAllServiceByAdmin")
+//    public  ResponseEntity<ResponseObj> getAllServiceByAdmin(){
+//        return  serviceImplement.getServiceAllByAdmin();
+//    }
 
-    @GetMapping("/v1/getServiceByIdIsActive/{id}")
+    @GetMapping("/v1/getOptionalServiceByIdIsActive/{id}")
     public ResponseEntity<ResponseObj> getServiceByIdIsActive(@PathVariable Long id){
-        return serviceImplement.getServiceByIdIsActive(id);
+        return serviceImplement.getOptinalServiceByIdIsActive(id);
     }
 
-    @GetMapping("/v1/getServiceByIdByAdmin/{id}")
-    public ResponseEntity<ResponseObj> getServiceByIdByAdmin(@PathVariable Long id){
-        return serviceImplement.getServiceByIdByAdmin(id);
-    }
+//    @GetMapping("/v1/getServiceByIdByAdmin/{id}")
+//    public ResponseEntity<ResponseObj> getServiceByIdByAdmin(@PathVariable Long id){
+//        return serviceImplement.getServiceByIdByAdmin(id);
+//    }
 
 
 
@@ -65,13 +65,13 @@ public class ServiceController {
                                                      @RequestPart(value = "price", required = false) String price,
                                                      @RequestPart(value = "file", required = false) MultipartFile serviceImage,
                                                      HttpServletRequest request){
-      try{
-          double price1 = Double.parseDouble(price);
-          ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
-          return serviceImplement.createService(serviceDTO, serviceImage);
-      }catch (NumberFormatException e){
-          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số",null));
-      }
+        try{
+            double price1 = Double.parseDouble(price);
+            OptinalServiceDTO serviceDTO = new OptinalServiceDTO(serviceName, serviceDescription, price1);
+            return serviceImplement.createOptionalService(serviceDTO, serviceImage);
+        }catch (NumberFormatException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Optinal service price phải là số",null));
+        }
     }
     @Operation(summary = "Update ảnh mới và xóa ảnh cũ")
     @PutMapping(value = "/v1/update/{serviceId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -85,16 +85,16 @@ public class ServiceController {
         if (price != null && !price.isEmpty()) {
             try {
                 price1 = Double.parseDouble(price);
-                ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
-                return serviceImplement.updateService(serviceId, serviceDTO, serviceImageFile);
+                OptinalServiceDTO serviceDTO = new OptinalServiceDTO(serviceName, serviceDescription, price1);
+                return serviceImplement.updateOptionalService(serviceId, serviceDTO, serviceImageFile);
             } catch (NumberFormatException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Service price phải là số", null));
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Optianl service price phải là số", null));
             }
         }
 
-        ServiceDTO serviceDTO = new ServiceDTO(serviceName, serviceDescription, price1);
-        return serviceImplement.updateService(serviceId, serviceDTO, serviceImageFile);
+        OptinalServiceDTO serviceDTO = new OptinalServiceDTO(serviceName, serviceDescription, price1);
+        return serviceImplement.updateOptionalService(serviceId, serviceDTO, serviceImageFile);
     }
 
 //    @PutMapping(value = "/updateService/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -114,8 +114,8 @@ public class ServiceController {
 //        return serviceImplement.updateService(id, serviceDTO);
 //    }
 
-    @DeleteMapping("/v1/deleteService/{id}")
+    @DeleteMapping("/v1/deleteOptionalService/{id}")
     public ResponseEntity<ResponseObj> deleteService(@PathVariable Long id){
-        return serviceImplement.deleteService(id);
+        return serviceImplement.deleteOptinalService(id);
     }
 }

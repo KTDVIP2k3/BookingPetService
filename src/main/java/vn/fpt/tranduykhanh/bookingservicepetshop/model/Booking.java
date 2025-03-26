@@ -1,12 +1,14 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.*;
 import lombok.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -23,6 +25,14 @@ public class Booking extends BaseEntity{
     private BookingStatusPaid bookingStatusPaid;
 
     private LocalDate localDate;
+
+    private LocalTime startTime;
+
+    private LocalTime endTime;
+
+    private LocalDate endDate;
+
+    private Double totalAmount;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -41,6 +51,10 @@ public class Booking extends BaseEntity{
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PaymentLinkData> paymentLinkData;
+
+    @ManyToOne
+    @JoinColumn(name = "optional_service_id")
+    private PetOptionalService petOptionalService;
 
     @ManyToOne
     @JoinColumn(name = "payment_id")

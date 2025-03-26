@@ -25,6 +25,8 @@ import vn.payos.PayOS;
 import vn.payos.type.*;
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,11 +93,18 @@ public class OrderController {
             logger.info("Bắt đầu tạo PaymentData với orderCode: {}", orderCode);
 
             // Tạo thông tin thanh toán
-            int numberPayment = 0;
-            if(booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC){
-               numberPayment = (int) booking.getService().getPrice() / 2;
+            BigDecimal totalAmount = BigDecimal.valueOf(booking.getTotalAmount()); // Giả sử là BigDecimal
+            BigDecimal numberPayment;
+
+            if (booking.getPayment().getPaymentMethodName() == PaymentMethodEnum.DAT_COC) {
+                numberPayment = totalAmount.divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP);
+            } else {
+                numberPayment = totalAmount;
             }
-            numberPayment = (int)booking.getService().getPrice();
+
+// Nếu cần số nguyên
+            int numberPaymentInt = numberPayment.intValue();
+
 
             if(booking.getBookingStatusPaid() == BookingStatusPaid.PAIDALL || booking.getBookingStatusPaid() == BookingStatusPaid.DEPOSIT){
                 return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking này đã trả rồi", bookingImplServce.convertoBookingReponse(booking)));
@@ -106,7 +115,7 @@ public class OrderController {
             }
 
 
-            if (numberPayment <= 0) {
+            if (numberPayment.intValue() <= 0) {
                 logger.error("Lỗi: Giá trị amount không hợp lệ ({})", numberPayment);
                 throw new IllegalArgumentException("Số tiền thanh toán không hợp lệ!");
             }
@@ -138,7 +147,7 @@ public class OrderController {
                     .item(itemData)
 //                    .description("Thanh toán đơn booking:\n"
 //                            + "Dịch vụ: " + booking.getService().getServiceName())
-                    .amount(numberPayment)
+                    .amount(numberPayment.intValue())
 //                    .returnUrl("https://bookingpetservice.onrender.com/api/payment/order?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId()) // Gửi bookingId về
 //                    .cancelUrl("https://bookingpetservice.onrender.com/api/payment/cancel?orderCode=" + orderCode  + "&bookingId=" + requestBody.getBookingId())
 //                    .build();

@@ -2,9 +2,13 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.RoleDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
+
+import java.time.LocalDate;
 
 
 public interface BookingInterfaceService {
@@ -20,6 +24,9 @@ public interface BookingInterfaceService {
 
     ResponseEntity<ResponseObj> getAllBookingByUser(HttpServletRequest request);
 
+    ResponseEntity<ResponseObj> getAllBookingByAdminByDropdown(LocalDate bookDate, BookingStatus bookingStatus, BookingStatusPaid bookingStatusPaid);
+
+    ResponseEntity<ResponseObj> getAllBookingByUserByDropdown(HttpServletRequest request,LocalDate bookDate, BookingStatus bookingStatus, BookingStatusPaid bookingStatusPaid);
 
     ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
 

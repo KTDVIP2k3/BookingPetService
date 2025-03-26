@@ -6,9 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.BookingImplServce;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/booking")
@@ -38,16 +43,25 @@ public class BookingController {
 
     @GetMapping("v1/getBookingDetailByIdByAdmin/{bookingId}")
     public ResponseEntity<ResponseObj> getBookingDetailByIdByAdmin(@PathVariable Long bookingId){
-        return bookingImplServce.getBookingByIdByAdmin(bookingId);
+        return bookingImplServce.getBookingDetailByAdmin(bookingId);
     }
 
     @GetMapping("v1/getBookingByIdByAdmin/{bookingId}")
     public ResponseEntity<ResponseObj> getBookingByIdByAdmin(@PathVariable Long bookingId){
         return bookingImplServce.getBookingByIdByAdmin(bookingId);
     }
-    @PostMapping(value = "/v1/bookingByUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseObj> bookingByUser(@ModelAttribute BookingDTO bookingDTO, HttpServletRequest request){
+
+    @GetMapping("v1/getBookingByAdmiByDropdown")
+    public ResponseEntity<ResponseObj> getBookingByAdmiByDropdown(@RequestParam LocalDate bookDate,
+                                                                  @RequestParam BookingStatus bookingStatus,
+                                                                  @RequestParam BookingStatusPaid bookingStatusPaid){
+        return bookingImplServce.getAllBookingByAdminByDropdown(bookDate,bookingStatus,bookingStatusPaid);
+    }
+    @PostMapping(value = "/v1/bookingByUser")
+    public ResponseEntity<ResponseObj> bookingByUser(@RequestBody BookingDTO bookingDTO, HttpServletRequest request){
         return bookingImplServce.createBooking(bookingDTO, request);
     }
+
+
 
 }

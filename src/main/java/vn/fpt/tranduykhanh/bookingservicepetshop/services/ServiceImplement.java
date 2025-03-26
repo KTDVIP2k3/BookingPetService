@@ -47,6 +47,31 @@ public class ServiceImplement implements ServiceInterface {
     }
 
     @Override
+    public ResponseEntity<ResponseObj> getServiceAllByAdmin() {
+        try{
+            List<ServiceResponse> serviceResponses = new ArrayList<>();
+            if(serviceRepository.findAll().isEmpty()){
+                return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "List is empty", serviceRepository.findAll()));
+            }
+            for(PetService service : serviceRepository.findAll()){
+                    serviceResponses.add(new ServiceResponse(service.getId(),service.getServiceName(), service.getDescription(), service.getPrice(), service.getImageServiceBase64(), service.isActive()));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "List of Service", serviceResponses));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), "Found!!!", e.getMessage()));
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> getServiceByIdByAdmin(Long id) {
+        Optional<PetService> service = serviceRepository.findById(id);
+        if(service != null){
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "OK", convertServiceToServiceResponseById(id)));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Service này không tồn tại", null));
+    }
+
+    @Override
     public ResponseEntity<ResponseObj> getServiceByIdIsActive(Long id) {
         Optional<PetService> service = serviceRepository.findById(id);
         if(service != null && service.get().isActive()){
@@ -138,7 +163,7 @@ public class ServiceImplement implements ServiceInterface {
 
                 }else{
                     if(existingServiceOpt.get().getImageServiceBase64() == null){
-                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+//                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
                     }else{
                         existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingServiceOpt.get().getImageServiceBase64()));
                     }
