@@ -57,6 +57,19 @@ public class BookingController {
                                                                   @RequestParam BookingStatusPaid bookingStatusPaid){
         return bookingImplServce.getAllBookingByAdminByDropdown(bookDate,bookingStatus,bookingStatusPaid);
     }
+
+    @GetMapping("v1/getBookingByStaffByDropdown")
+    public ResponseEntity<ResponseObj> getBookingByStaffByDropdown(@RequestParam LocalDate bookDate){
+        return bookingImplServce.getAllBookingByStaffByDropdown(bookDate);
+    }
+
+    @GetMapping("v1/getBookingByUserByDropdown")
+    public ResponseEntity<ResponseObj> getBookingByUserByDropdown(@RequestParam LocalDate bookDate,
+                                                                  @RequestParam BookingStatus bookingStatus,
+                                                                  @RequestParam BookingStatusPaid bookingStatusPaid,
+                                                                  HttpServletRequest request){
+        return bookingImplServce.getAllBookingByUserByDropdown(request,bookDate,bookingStatus,bookingStatusPaid);
+    }
     @PostMapping(value = "/v1/bookingByUser")
     public ResponseEntity<ResponseObj> bookingByUser(@RequestBody BookingDTO bookingDTO, HttpServletRequest request){
         return bookingImplServce.createBooking(bookingDTO, request);

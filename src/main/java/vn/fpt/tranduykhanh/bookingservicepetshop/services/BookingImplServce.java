@@ -336,6 +336,27 @@ public class BookingImplServce implements BookingInterfaceService {
     }
 
     @Override
+    public ResponseEntity<ResponseObj> getAllBookingByStaffByDropdown(LocalDate bookDate) {
+        try {
+
+            List<Booking> bookingList = bookingRepository.findAll();
+            List<BookingReponse> bookingReponses = new ArrayList<>();
+            for(Booking booking : bookingList){
+                if(booking.getLocalDate().equals(bookDate)){
+                    bookingReponses.add(convertoBookingReponse(booking));
+                }
+            }
+
+            if(bookingReponses.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponseObj(HttpStatus.NO_CONTENT.toString(), "Booking list theo ngay nay la trong", bookingReponses));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Booking list theo ngay", bookingReponses));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(),  "Errors server!", e.getMessage()));
+        }
+    }
+
+    @Override
     public ResponseEntity<ResponseObj> getAllBookingByUserByDropdown(HttpServletRequest request, LocalDate bookDate, BookingStatus bookingStatus, BookingStatusPaid bookingStatusPaid) {
         User user = userImplement.getUserByToken(request);
         List<Booking> bookingList = user.getBookingList();

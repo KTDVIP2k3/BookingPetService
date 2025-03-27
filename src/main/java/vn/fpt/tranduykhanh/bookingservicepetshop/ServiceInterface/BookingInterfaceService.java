@@ -26,6 +26,8 @@ public interface BookingInterfaceService {
 
     ResponseEntity<ResponseObj> getAllBookingByAdminByDropdown(LocalDate bookDate, BookingStatus bookingStatus, BookingStatusPaid bookingStatusPaid);
 
+    ResponseEntity<ResponseObj> getAllBookingByStaffByDropdown(LocalDate bookDate);
+
     ResponseEntity<ResponseObj> getAllBookingByUserByDropdown(HttpServletRequest request,LocalDate bookDate, BookingStatus bookingStatus, BookingStatusPaid bookingStatusPaid);
 
     ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
