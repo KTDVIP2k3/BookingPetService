@@ -433,4 +433,9 @@ public class UserImplement implements UserInterface {
 //        return ResponseEntity.status(HttpStatus.OK)
 //                .body(new ResponseObj(HttpStatus.OK.toString(), "Tài khoản đã bị khóa", user));
 //    }
+
+    public String deletAll(){
+        userRepository.deleteAll();
+        return "xoa thanh cong";
+    }
 }

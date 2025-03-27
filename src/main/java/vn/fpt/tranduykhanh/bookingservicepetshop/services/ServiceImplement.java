@@ -214,4 +214,9 @@ public class ServiceImplement implements ServiceInterface {
 //        serviceRepository.save(serviceOpt.get());
         return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),"Service deleted successfully", null));
     }
+
+    public String deleteAll(){
+        serviceRepository.deleteAll();
+        return "Delete all successfylly";
+    }
 }

@@ -75,6 +75,10 @@ public class BookingController {
         return bookingImplServce.createBooking(bookingDTO, request);
     }
 
+//    @DeleteMapping("/v1/deletAll")
+//    public String deleteAll(){
+//       return  bookingImplServce.deletBooking();
+//    }
 
 
 }

@@ -118,4 +118,9 @@ public class OptinalServiceController {
     public ResponseEntity<ResponseObj> deleteService(@PathVariable Long id){
         return serviceImplement.deleteOptinalService(id);
     }
+
+//    @DeleteMapping("/v1/deletAll")
+//    public String deleteAll(){
+//        return  serviceImplement.deleteAll();
+//    }
 }

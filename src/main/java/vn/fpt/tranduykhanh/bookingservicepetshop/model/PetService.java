@@ -17,6 +17,8 @@ import java.util.List;
 public class PetService extends BaseEntity{
     private String serviceName;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private double price;

@@ -190,4 +190,9 @@ public class PetOptinalServiceImplement implements PetOptionalServiceServiceInte
         return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),"Service deleted successfully", null));
 
     }
+
+    public String deleteAll(){
+        petOptionalServiceRepository.deleteAll();
+        return  "Delete successfully";
+    }
 }

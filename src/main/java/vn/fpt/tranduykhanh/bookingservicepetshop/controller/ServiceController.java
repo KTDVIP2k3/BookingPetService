@@ -118,4 +118,9 @@ public class ServiceController {
     public ResponseEntity<ResponseObj> deleteService(@PathVariable Long id){
         return serviceImplement.deleteService(id);
     }
+
+//    @DeleteMapping("/v1/deletAll")
+//    public String deleteAll(){
+//        return  serviceImplement.deleteAll();
+//    }
 }

@@ -417,6 +417,11 @@ public class BookingImplServce implements BookingInterfaceService {
         }
     }
 
+    public String deletBooking(){
+        bookingRepository.deleteAll();
+        return "Xoa tat ca thanh cong";
+    }
+
     public Booking getBookingByIdV2(Long bookingId) {
        return bookingRepository.findById(bookingId).get();
     }

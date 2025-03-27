@@ -27,6 +27,8 @@ public class Pet extends BaseEntity{
 
     private String imagePetBase64;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String notes;
 
     @ManyToOne

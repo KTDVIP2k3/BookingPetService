@@ -2,9 +2,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -19,6 +17,8 @@ public class PetOptionalService extends BaseEntity{
 
     private String serviceName;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private double price;
@@ -26,6 +26,7 @@ public class PetOptionalService extends BaseEntity{
     private String imageServiceBase64;
 
     private final int maxSlot = 20;
+
 
     @OneToMany(mappedBy = "petOptionalService", cascade = CascadeType.ALL)
     @JsonIgnore
