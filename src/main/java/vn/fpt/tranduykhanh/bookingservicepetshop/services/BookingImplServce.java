@@ -171,10 +171,10 @@ public class BookingImplServce implements BookingInterfaceService {
     public BookingReponse convertoBookingReponse(Booking booking) {
         return new BookingReponse(
                 booking.getId(),
-                booking.getUser().getFullName(),
                 booking.getService().getServiceName(),
                 Optional.ofNullable(booking.getPetOptionalService()).map(PetOptionalService::getServiceName).orElse(null),
                 booking.getPet().getPetName(),
+                booking.getUser().getFullName(),
                 booking.getLocalDate(),
                 booking.getStartTime(),
                 booking.getEndTime(),
