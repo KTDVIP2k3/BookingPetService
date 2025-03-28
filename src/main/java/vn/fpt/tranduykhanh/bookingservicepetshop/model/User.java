@@ -42,7 +42,7 @@ public class User extends BaseEntity implements UserDetails {
     private String avatarBase64;
 
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
      // Tránh vòng lặp khi serialize JSON
     @JsonIgnore
     private List<Pet> petList;

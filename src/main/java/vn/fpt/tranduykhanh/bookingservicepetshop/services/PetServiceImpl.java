@@ -1,6 +1,7 @@
 package vn.fpt.tranduykhanh.bookingservicepetshop.services;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -235,9 +236,14 @@ public class PetServiceImpl implements PetService {
            }
 
 
-
            uploadImageFileService.deleteImage(petOpt.get().getImagePetBase64());
-           petRepository.deleteById(petId);
+//           petOpt.get().setUser(null);
+           User user = userImplement.getUserByToken(request);
+           Pet pet = petRepository.findById(petId).orElseThrow();
+           user.getPetList().remove(pet);
+           userRepository.save(user);
+//           petRepository.deleteById(petOpt.get().getId());
+//           petRepository.flush();
            return ResponseEntity.status(HttpStatus.OK)
                    .body(new ResponseObj(HttpStatus.OK.toString(), "Xóa thú cưng thành công", null));
        }catch (Exception e){
