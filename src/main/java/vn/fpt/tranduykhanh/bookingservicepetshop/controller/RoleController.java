@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.RoleRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.RoleDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
 import vn.fpt.tranduykhanh.bookingservicepetshop.services.RoleImplement;
@@ -15,6 +16,9 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.services.RoleImplement;
 public class RoleController {
     @Autowired
     RoleImplement roleImplement;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     @GetMapping("getAllRole")
     public ResponseEntity<ResponseObj> getAllRole(){
@@ -33,5 +37,11 @@ public class RoleController {
         }
 
         return roleImplement.updateRole(roleId, roleDTO);
+    }
+
+    @DeleteMapping("/deletAllRole")
+    public String deleteAll(){
+        roleRepository.deleteAll();
+        return "Xoa thanh cong";
     }
 }

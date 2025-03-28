@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class Pet extends BaseEntity{
+public class Pet extends BaseEntity {
     private String petName;
 
     @Enumerated(EnumType.STRING)
@@ -27,7 +27,6 @@ public class Pet extends BaseEntity{
 
     private String imagePetBase64;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String notes;
 

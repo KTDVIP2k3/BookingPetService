@@ -17,7 +17,6 @@ public class PetOptionalService extends BaseEntity{
 
     private String serviceName;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
 

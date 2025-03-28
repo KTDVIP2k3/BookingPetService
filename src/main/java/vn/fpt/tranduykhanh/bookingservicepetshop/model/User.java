@@ -36,14 +36,15 @@ public class User extends BaseEntity implements UserDetails {
 
     private String address;
 
-//    @Lob
-//    @Column(columnDefinition = "TEXT")
-//    @JsonIgnore
+////    @Lob
+////    @Column(columnDefinition = "TEXT")
+//@Column(columnDefinition = "TEXT")
     private String avatarBase64;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
      // Tránh vòng lặp khi serialize JSON
+    @JsonIgnore
     private List<Pet> petList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

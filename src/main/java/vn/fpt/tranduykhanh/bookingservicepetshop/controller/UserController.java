@@ -116,10 +116,10 @@ public class UserController {
         return userService.deleteProfile(request);
     }
 
-//    @DeleteMapping("/v1/deleteAll")
-//    public String deletAll(){
-//        return userService.deletAll();
-//    }
+    @DeleteMapping("/v1/deleteAll")
+    public String deletAll(){
+        return userService.deletAll();
+    }
 //    @PutMapping("/{accountId}")
 //    public ResponseEntity<ResponseObj> updateUser(
 //            @PathVariable Long accountId,
