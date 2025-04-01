@@ -222,7 +222,11 @@ public class BookingImplServce implements BookingInterfaceService {
                 booking.getPet().getAge(),
                 booking.getPet().getNotes(),
                 booking.getPayment().getPaymentMethodName(),
-                booking.getCreateAt()
+                booking.getCreateAt(),
+                booking.getStartTime(),
+                booking.getEndTime(),
+                booking.getEndDate(),
+                booking.getTotalAmount()
         );
     }
     @Override
