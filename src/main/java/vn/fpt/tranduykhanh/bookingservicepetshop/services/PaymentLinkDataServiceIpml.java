@@ -42,29 +42,26 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
                 }
             }
 
-//            if (paymentLinkDataDTO.getPayment() == null) {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Payment does not exist", null));
-//            }
-
             paymentLinkDatnLinkData.setId(paymentLinkDataDTO.getPaymentLinkData().getId());
 
             paymentLinkDatnLinkData.setBooking(paymentLinkDataDTO.getBooking());
 
-            if(paymentLinkDataDTO.getBooking().getTotalAmount() % paymentLinkDataDTO.getPaymentLinkData().getAmount() == 0) {
-                paymentLinkDatnLinkData.setAmount((int) (double) booking.getTotalAmount());
-                paymentLinkDatnLinkData.setStatus(BookingStatusPaid.DEPOSIT.toString());
-                paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
-                paymentLinkDatnLinkData.setAmountRemaining((int) (double) booking.getTotalAmount() - paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
-            }else if ((int) (double)paymentLinkDataDTO.getBooking().getTotalAmount() == paymentLinkDataDTO.getPaymentLinkData().getAmount()){
         paymentLinkDatnLinkData.setAmount(paymentLinkDataDTO.getPaymentLinkData().getAmount());
 
-        paymentLinkDatnLinkData.setStatus("PAIDALL");
+        paymentLinkDatnLinkData.setStatus(BookingStatusPaid.PAIDALL.toString());
 
         paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
 
         paymentLinkDatnLinkData.setAmountRemaining(paymentLinkDataDTO.getPaymentLinkData().getAmountRemaining());
 
-    }
+
+
+        if(paymentLinkDataDTO.getBooking().getTotalAmount() % paymentLinkDataDTO.getPaymentLinkData().getAmount() == 0) {
+                paymentLinkDatnLinkData.setAmount((int) (double) booking.getTotalAmount());
+                paymentLinkDatnLinkData.setStatus(BookingStatusPaid.DEPOSIT.toString());
+                paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
+                paymentLinkDatnLinkData.setAmountRemaining((int) (double) booking.getTotalAmount() - paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
+            }
             paymentLinkDatnLinkData.setOrderCode(paymentLinkDataDTO.getPaymentLinkData().getOrderCode());
 
             paymentLinkDatnLinkData.setCanceledAt(paymentLinkDataDTO.getPaymentLinkData().getCanceledAt());
