@@ -14,6 +14,7 @@ import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.PaymentMethodEnum;
 import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.BookingRepository;
+import vn.fpt.tranduykhanh.bookingservicepetshop.repositories.PaymentLinkDataRepository;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.CreatePaymentLinkRequestBody;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.PaymentLinkDataDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.TransactionDTO;
@@ -51,6 +52,9 @@ public class OrderController {
 
     @Autowired
     BookingImplServce bookingImplServce;
+
+    @Autowired
+    PaymentLinkDataRepository paymentLinkDataRepository;
 
     @Autowired
     TransactionServiceImple transactionServiceImple;
@@ -338,6 +342,12 @@ public class OrderController {
 
         BookingReponse bookingReponse = bookingImplServce.convertoBookingReponse(booking);
 
+        for(PaymentLinkData paymentLinkData1 : booking.getPaymentLinkData()){
+            if(paymentLinkData1.getOrderCode() == Long.parseLong(orderCode)){
+                paymentLinkData1.setStatus(booking.getBookingStatusPaid().toString());
+                paymentLinkDataRepository.save(paymentLinkData1);
+            }
+        }
         orderReponse.setBookingReponse(bookingReponse);
         orderReponse.setPaymentLinkData(paymentLinkData);
 
