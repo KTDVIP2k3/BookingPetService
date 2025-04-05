@@ -346,6 +346,7 @@ public class OrderController {
             if(paymentLinkData1.getOrderCode() == Long.parseLong(orderCode)){
                 paymentLinkData1.setStatus(booking.getBookingStatusPaid().toString());
                 paymentLinkDataRepository.save(paymentLinkData1);
+                break;
             }
         }
         orderReponse.setBookingReponse(bookingReponse);
