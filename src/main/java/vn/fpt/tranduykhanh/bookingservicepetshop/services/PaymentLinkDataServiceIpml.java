@@ -50,7 +50,7 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
 
             paymentLinkDatnLinkData.setBooking(paymentLinkDataDTO.getBooking());
 
-            if(paymentLinkDataDTO.getBooking().getBookingStatusPaid() == BookingStatusPaid.DEPOSIT) {
+            if(paymentLinkDataDTO.getBooking().getTotalAmount() / paymentLinkDataDTO.getPaymentLinkData().getAmount() == 2) {
                 paymentLinkDatnLinkData.setAmount((int) (double) booking.getTotalAmount());
                 paymentLinkDatnLinkData.setStatus(BookingStatusPaid.DEPOSIT.toString());
                 paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
