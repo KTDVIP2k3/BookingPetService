@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.PaymnetLinkDataServiceInterface;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.Booking;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.PaymentLinkData;
@@ -49,14 +50,21 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
 
             paymentLinkDatnLinkData.setBooking(paymentLinkDataDTO.getBooking());
 
-            paymentLinkDatnLinkData.setAmount(paymentLinkDataDTO.getPaymentLinkData().getAmount());
+            if(paymentLinkDataDTO.getBooking().getBookingStatusPaid() == BookingStatusPaid.DEPOSIT) {
+                paymentLinkDatnLinkData.setAmount((int) (double) booking.getTotalAmount());
+                paymentLinkDatnLinkData.setStatus(BookingStatusPaid.DEPOSIT.toString());
+                paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
+                paymentLinkDatnLinkData.setAmountRemaining((int) (double) booking.getTotalAmount() - paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
+            }else{
+        paymentLinkDatnLinkData.setAmount(paymentLinkDataDTO.getPaymentLinkData().getAmount());
 
-            paymentLinkDatnLinkData.setStatus(paymentLinkDataDTO.getPaymentLinkData().getStatus());
+        paymentLinkDatnLinkData.setStatus(BookingStatusPaid.PAIDALL.toString());
 
-            paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
+        paymentLinkDatnLinkData.setAmountPaid(paymentLinkDataDTO.getPaymentLinkData().getAmountPaid());
 
-            paymentLinkDatnLinkData.setAmountRemaining(paymentLinkDataDTO.getPaymentLinkData().getAmountRemaining());
+        paymentLinkDatnLinkData.setAmountRemaining(paymentLinkDataDTO.getPaymentLinkData().getAmountRemaining());
 
+    }
             paymentLinkDatnLinkData.setOrderCode(paymentLinkDataDTO.getPaymentLinkData().getOrderCode());
 
             paymentLinkDatnLinkData.setCanceledAt(paymentLinkDataDTO.getPaymentLinkData().getCanceledAt());
@@ -72,6 +80,10 @@ public class PaymentLinkDataServiceIpml implements PaymnetLinkDataServiceInterfa
 //        }catch (Exception e)
     }
 
+    public String deleteAll(){
+        paymentLinkDataRepository.deleteAll();
+        return "Successfull";
+    }
     public PaymentLinkData getPaymentLinkDataById(String id) {
         List<PaymentLinkData> paymentLinkDataList = paymentLinkDataRepository.findAll();
         for (PaymentLinkData paymentLinkData : paymentLinkDataList) {
