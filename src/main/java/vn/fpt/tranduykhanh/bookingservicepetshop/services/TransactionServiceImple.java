@@ -117,8 +117,8 @@ public class TransactionServiceImple implements TransactionServiceInterface {
                     .toList();
 
             if (transactionListFilter.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                        .body(new ResponseObj(HttpStatus.NO_CONTENT.toString(), "Danh sách giao dịch trống", transactionListFilter));
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObj(HttpStatus.OK.toString(), "Danh sách giao dịch trống", transactionListFilter));
             }
 
             return ResponseEntity.status(HttpStatus.OK)
