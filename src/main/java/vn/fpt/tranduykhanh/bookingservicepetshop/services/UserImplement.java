@@ -437,7 +437,10 @@ public class UserImplement implements UserInterface {
     public String deletAll(){
         List<User> users = userRepository.findAll();
         for (User user : users) {
-            userRepository.delete(user);
+           if(user.getId() != 28){
+               user.setRole(null);
+               userRepository.delete(user);
+           }
         }
         return "xoa thanh cong";
     }
