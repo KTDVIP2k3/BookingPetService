@@ -50,23 +50,22 @@ public class BookingController {
     public ResponseEntity<ResponseObj> getBookingByIdByAdmin(@PathVariable Long bookingId){
         return bookingImplServce.getBookingByIdByAdmin(bookingId);
     }
-
     @GetMapping("v1/getBookingByAdmiByDropdown")
-    public ResponseEntity<ResponseObj> getBookingByAdmiByDropdown(@RequestParam LocalDate bookDate,
-                                                                  @RequestParam BookingStatus bookingStatus,
-                                                                  @RequestParam BookingStatusPaid bookingStatusPaid){
-        return bookingImplServce.getAllBookingByAdminByDropdown(bookDate,bookingStatus,bookingStatusPaid);
+    public ResponseEntity<ResponseObj> getBookingByAdmiByDropdown(@RequestParam(required = false) LocalDate bookDate,
+                                                                  @RequestParam(required = false) BookingStatus bookingStatus,
+                                                                  @RequestParam(required = false) BookingStatusPaid bookingStatusPaid){
+        return bookingImplServce.getAllBookingByAdminByDropdown(bookDate, bookingStatus, bookingStatusPaid);
     }
 
     @GetMapping("v1/getBookingByStaffByDropdown")
-    public ResponseEntity<ResponseObj> getBookingByStaffByDropdown(@RequestParam LocalDate bookDate){
+    public ResponseEntity<ResponseObj> getBookingByStaffByDropdown(@RequestParam(required = false) LocalDate bookDate){
         return bookingImplServce.getAllBookingByStaffByDropdown(bookDate);
     }
 
     @GetMapping("v1/getBookingByUserByDropdown")
-    public ResponseEntity<ResponseObj> getBookingByUserByDropdown(@RequestParam LocalDate bookDate,
-                                                                  @RequestParam BookingStatus bookingStatus,
-                                                                  @RequestParam BookingStatusPaid bookingStatusPaid,
+    public ResponseEntity<ResponseObj> getBookingByUserByDropdown(@RequestParam(required = false) LocalDate bookDate,
+                                                                  @RequestParam(required = false) BookingStatus bookingStatus,
+                                                                  @RequestParam(required = false) BookingStatusPaid bookingStatusPaid,
                                                                   HttpServletRequest request){
         return bookingImplServce.getAllBookingByUserByDropdown(request,bookDate,bookingStatus,bookingStatusPaid);
     }
