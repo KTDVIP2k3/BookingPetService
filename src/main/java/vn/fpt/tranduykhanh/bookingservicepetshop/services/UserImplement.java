@@ -261,22 +261,24 @@ public class UserImplement implements UserInterface {
             user.setEmail(userDTO.getEmail());
         }
 
+//
+//      if(userDTO.getUserImageFile() != null){
+//          if(userDTO.getUserImageFile() == null){
+//              user.setAvatarBase64(null);
+//          }else{
+//          }
+//      }
 
-      if(userDTO.getUserImageFile() != null){
-          if(userDTO.getUserImageFile() == null){
-              user.setAvatarBase64(null);
-          }else{
-              try {
-                  if(user.getAvatarBase64() == null){
-                      user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
-                  }else{
-                      user.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
-                  }
-              }catch (IOException e){
-                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
-              }
-          }
-      }
+        try {
+            if(user.getAvatarBase64() == null){
+                user.setAvatarBase64(uploadImageFileService.uploadImage(userDTO.getUserImageFile()));
+            }else{
+                user.setAvatarBase64(uploadImageFileService.updateImage(userDTO.getUserImageFile(), user.getAvatarBase64()));
+            }
+        }catch (IOException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Phải chọn ảnh hoặc sai formant ảnh ", null));
+        }
+
         user.setUpdateAt(LocalDateTime.now());
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObj(HttpStatus.OK.toString(), "Update Succesfully", convertUserToUserResponse(user)));

@@ -105,7 +105,7 @@ public class TransactionServiceImple implements TransactionServiceInterface {
                     .filter(transaction -> bookingStatusPaid == null || transaction.getPaymentLink().getStatus().equals(bookingStatusPaid.toString()))
                     .map(transaction -> new TransactionResponse(
                             transaction.getId(),
-                            transaction.getAmount(),
+                            transaction.getPaymentLink().getBooking().getTotalAmount().intValue(),
                             transaction.getPaymentLink().getAmountPaid(),
                             transaction.getPaymentLink().getAmountRemaining(),
                             transaction.getPaymentLink().getStatus(),
@@ -151,7 +151,7 @@ public class TransactionServiceImple implements TransactionServiceInterface {
     private TransactionResponse convertToTransactionResponse(Transaction transaction){
         TransactionResponse transactionResponse = new TransactionResponse();
         transactionResponse.setId(transaction.getId());
-        transactionResponse.setAmount(transaction.getAmount());
+        transactionResponse.setAmount(transaction.getPaymentLink().getBooking().getTotalAmount().intValue());
         transactionResponse.setAmountPaid(transaction.getPaymentLink().getAmountPaid());
         transactionResponse.setAmountRemaining(transaction.getPaymentLink().getAmountRemaining());
         transactionResponse.setTransactionDateTime(transaction.getTransactionDateTime());
