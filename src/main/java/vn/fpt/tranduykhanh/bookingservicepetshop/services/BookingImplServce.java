@@ -439,31 +439,35 @@ public class BookingImplServce implements BookingInterfaceService {
         LocalDateTime endDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getEndTime());
 
         if (newStatus.INPROGRESS.toString() == BookingStatus.INPROGRESS.toString()) {
+            booking.setBookingStatus(BookingStatus.INPROGRESS);
+            bookingRepository.save(booking);
             // Chỉ cho phép khi hiện tại nằm trong khoảng +/- 1 phút quanh giờ bắt đầu
-            if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-                                "Chỉ được chuyển sang INPROGRESS đúng vào giờ bắt đầu", null));
-            }else if(booking.getBookingStatus() != BookingStatus.PENDING){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang cho(pending) thi moi chuyen qua trang thai dang dien ra(Inprogress)", null));
-            }else{
-                booking.setBookingStatus(BookingStatus.INPROGRESS);
-                bookingRepository.save(booking);
-
-            }
+//            if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+//                                "Chỉ được chuyển sang INPROGRESS đúng vào giờ bắt đầu", null));
+//            }else if(booking.getBookingStatus() != BookingStatus.PENDING){
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang cho(pending) thi moi chuyen qua trang thai dang dien ra(Inprogress)", null));
+//            }else{
+//                booking.setBookingStatus(BookingStatus.INPROGRESS);
+//                bookingRepository.save(booking);
+//
+//            }
 
         } else if (newStatus.COMPLETED.toString() == BookingStatus.COMPLETED.toString()) {
-            // Chỉ cho phép khi hiện tại >= giờ kết thúc
-            if (now.isBefore(endDateTime)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-                                "Chưa đến giờ kết thúc, không thể chuyển sang COMPLETED", null));
-            }else if(booking.getBookingStatus() != BookingStatus.INPROGRESS){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang dien ra(inprogress) thi moi chuyen qua trang thai hoan thanh(completed)", null));
-            }else{
-                booking.setBookingStatus(BookingStatus.COMPLETED);
+            booking.setBookingStatus(BookingStatus.COMPLETED);
                 bookingRepository.save(booking);
-            }
+//            // Chỉ cho phép khi hiện tại >= giờ kết thúc
+//            if (now.isBefore(endDateTime)) {
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+//                                "Chưa đến giờ kết thúc, không thể chuyển sang COMPLETED", null));
+//            }else if(booking.getBookingStatus() != BookingStatus.INPROGRESS){
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang dien ra(inprogress) thi moi chuyen qua trang thai hoan thanh(completed)", null));
+//            }else{
+//                booking.setBookingStatus(BookingStatus.COMPLETED);
+//                bookingRepository.save(booking);
+//            }
 
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
