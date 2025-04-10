@@ -438,46 +438,58 @@ public class BookingImplServce implements BookingInterfaceService {
         LocalDateTime startDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getStartTime());
         LocalDateTime endDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getEndTime());
 
-        if (newStatus.INPROGRESS.toString() == BookingStatus.INPROGRESS.toString()) {
-            booking.setBookingStatus(BookingStatus.INPROGRESS);
-            bookingRepository.save(booking);
-            // Chỉ cho phép khi hiện tại nằm trong khoảng +/- 1 phút quanh giờ bắt đầu
+        // Chuyển từ DTO sang Entity Enum
+        BookingStatus statusToSet;
+        try {
+            statusToSet = BookingStatus.valueOf(newStatus.name());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Trạng thái không hợp lệ", null));
+        }
+
+        // Xử lý theo trạng thái cụ thể
+        if (statusToSet == BookingStatus.INPROGRESS) {
+            // Optional: kiểm tra điều kiện thời gian như bạn muốn
+            if (currentStatus != BookingStatus.PENDING) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+                                "Chỉ booking có trạng thái PENDING mới chuyển sang INPROGRESS", null));
+            }
+
 //            if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
 //                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 //                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
 //                                "Chỉ được chuyển sang INPROGRESS đúng vào giờ bắt đầu", null));
-//            }else if(booking.getBookingStatus() != BookingStatus.PENDING){
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang cho(pending) thi moi chuyen qua trang thai dang dien ra(Inprogress)", null));
-//            }else{
-//                booking.setBookingStatus(BookingStatus.INPROGRESS);
-//                bookingRepository.save(booking);
-//
 //            }
 
-        } else if (newStatus.COMPLETED.toString() == BookingStatus.COMPLETED.toString()) {
-            booking.setBookingStatus(BookingStatus.COMPLETED);
-                bookingRepository.save(booking);
-//            // Chỉ cho phép khi hiện tại >= giờ kết thúc
+            booking.setBookingStatus(BookingStatus.INPROGRESS);
+            booking.setUpdateAt(LocalDateTime.now());
+            bookingRepository.save(booking);
+
+        } else if (statusToSet == BookingStatus.COMPLETED) {
+            if (currentStatus != BookingStatus.INPROGRESS) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+                                "Chỉ booking đang INPROGRESS mới chuyển sang COMPLETED", null));
+            }
+//
 //            if (now.isBefore(endDateTime)) {
 //                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 //                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-//                                "Chưa đến giờ kết thúc, không thể chuyển sang COMPLETED", null));
-//            }else if(booking.getBookingStatus() != BookingStatus.INPROGRESS){
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Chi booking nao co trang thai dang dien ra(inprogress) thi moi chuyen qua trang thai hoan thanh(completed)", null));
-//            }else{
-//                booking.setBookingStatus(BookingStatus.COMPLETED);
-//                bookingRepository.save(booking);
+//                                "Chỉ được chuyển sang COMPLETED sau khi kết thúc", null));
 //            }
+
+            booking.setBookingStatus(BookingStatus.COMPLETED);
+            booking.setUpdateAt(LocalDateTime.now());
+            bookingRepository.save(booking);
 
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-                            "Trạng thái không hợp lệ hoặc chưa hỗ trợ cập nhật", null));
+                            "Chỉ hỗ trợ chuyển sang INPROGRESS hoặc COMPLETED", null));
         }
 
-        // Nếu qua được điều kiện thì cập nhật trạng thái
-        return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),
-                "Cập nhật trạng thái booking thành công", booking));
+        return ResponseEntity.ok(new ResponseObj("200", "Cập nhật trạng thái thành công", booking));
     }
 
     public String setBookingStatus(){
