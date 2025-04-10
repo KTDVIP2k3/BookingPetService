@@ -158,10 +158,10 @@ public class UserImplement implements UserInterface {
         if(userDTO.getAddress() == null || userDTO.getAddress().isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Địa chỉ không được để trống!", null));
         }
-
-        if(userDTO.getUserImageFile() == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Image không được để trống!", null));
-        }
+//
+//        if(userDTO.getUserImageFile() == null){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(), "Image không được để trống!", null));
+//        }
 
         try {
             User user = new User();
