@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.response.ResponseObj;
@@ -75,7 +76,7 @@ public class BookingController {
     }
 
     @PutMapping("/v1/setBookingStatusForAdminAndStaff")
-    public ResponseEntity<ResponseObj> setBookingStatus(@RequestParam("bookingId") Long bookingId, @RequestParam BookingStatus bookingStatus){
+    public ResponseEntity<ResponseObj> setBookingStatus(@RequestParam("bookingId") Long bookingId, @RequestParam BookingStatusDTO bookingStatus){
         return bookingImplServce.setBookingStatus(bookingId, bookingStatus);
     }
 

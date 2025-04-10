@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface.BookingInterfaceService;
 import vn.fpt.tranduykhanh.bookingservicepetshop.model.*;
@@ -423,7 +424,7 @@ public class BookingImplServce implements BookingInterfaceService {
     }
 
     @Override
-    public ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatus newStatus) {
+    public ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatusDTO newStatus) {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
 
         if (bookingOptional.isEmpty()) {
@@ -437,20 +438,27 @@ public class BookingImplServce implements BookingInterfaceService {
         LocalDateTime startDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getStartTime());
         LocalDateTime endDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getEndTime());
 
-        if (newStatus == BookingStatus.INPROGRESS) {
+        if (newStatus.INPROGRESS.toString() == BookingStatus.INPROGRESS.toString()) {
             // Chỉ cho phép khi hiện tại nằm trong khoảng +/- 1 phút quanh giờ bắt đầu
             if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
                                 "Chỉ được chuyển sang INPROGRESS đúng vào giờ bắt đầu", null));
+            }else{
+                booking.setBookingStatus(BookingStatus.INPROGRESS);
+                bookingRepository.save(booking);
+
             }
 
-        } else if (newStatus == BookingStatus.COMPLETED) {
+        } else if (newStatus.COMPLETED.toString() == BookingStatus.COMPLETED.toString()) {
             // Chỉ cho phép khi hiện tại >= giờ kết thúc
             if (now.isBefore(endDateTime)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
                                 "Chưa đến giờ kết thúc, không thể chuyển sang COMPLETED", null));
+            }else{
+                booking.setBookingStatus(BookingStatus.COMPLETED);
+                bookingRepository.save(booking);
             }
 
         } else {
@@ -460,9 +468,6 @@ public class BookingImplServce implements BookingInterfaceService {
         }
 
         // Nếu qua được điều kiện thì cập nhật trạng thái
-        booking.setBookingStatus(newStatus);
-        bookingRepository.save(booking);
-
         return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),
                 "Cập nhật trạng thái booking thành công", booking));
     }

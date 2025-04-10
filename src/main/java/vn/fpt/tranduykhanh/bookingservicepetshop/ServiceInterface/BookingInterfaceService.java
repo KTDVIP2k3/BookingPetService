@@ -3,6 +3,7 @@ package vn.fpt.tranduykhanh.bookingservicepetshop.ServiceInterface;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
+import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.BookingDTO;
 import vn.fpt.tranduykhanh.bookingservicepetshop.request.RoleDTO;
@@ -32,7 +33,7 @@ public interface BookingInterfaceService {
 
     ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
 
-    ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatus bookingStatus);
+    ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatusDTO bookingStatus);
 
     interface RoleInterface {
         ResponseEntity<ResponseObj> createRole (RoleDTO roleDTO);
