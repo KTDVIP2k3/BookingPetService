@@ -74,6 +74,16 @@ public class BookingController {
         return bookingImplServce.createBooking(bookingDTO, request);
     }
 
+    @PutMapping("/v1/setBookingStatusForAdminAndStaff")
+    public ResponseEntity<ResponseObj> setBookingStatus(@RequestParam("bookingId") Long bookingId, @RequestParam BookingStatus bookingStatus){
+        return bookingImplServce.setBookingStatus(bookingId, bookingStatus);
+    }
+
+//    @PutMapping
+//    public String setBooking(){
+//        return bookingImplServce.setBookingStatus();
+//    }
+
 //    @DeleteMapping("/v1/deletAll")
 //    public String deleteAll(){
 //       return  bookingImplServce.deletBooking();

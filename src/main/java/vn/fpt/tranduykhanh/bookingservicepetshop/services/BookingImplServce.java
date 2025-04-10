@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatus;
 import vn.fpt.tranduykhanh.bookingservicepetshop.Enum.BookingStatusPaid;
@@ -418,6 +419,95 @@ public class BookingImplServce implements BookingInterfaceService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseObj(HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.toString(), null));
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatus newStatus) {
+        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
+
+        if (bookingOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObj(HttpStatus.NOT_FOUND.toString(), "Booking này không tồn tại", null));
+        }
+
+        Booking booking = bookingOptional.get();
+        BookingStatus currentStatus = booking.getBookingStatus();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getStartTime());
+        LocalDateTime endDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getEndTime());
+
+        if (newStatus == BookingStatus.INPROGRESS) {
+            // Chỉ cho phép khi hiện tại nằm trong khoảng +/- 1 phút quanh giờ bắt đầu
+            if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+                                "Chỉ được chuyển sang INPROGRESS đúng vào giờ bắt đầu", null));
+            }
+
+        } else if (newStatus == BookingStatus.COMPLETED) {
+            // Chỉ cho phép khi hiện tại >= giờ kết thúc
+            if (now.isBefore(endDateTime)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+                                "Chưa đến giờ kết thúc, không thể chuyển sang COMPLETED", null));
+            }
+
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
+                            "Trạng thái không hợp lệ hoặc chưa hỗ trợ cập nhật", null));
+        }
+
+        // Nếu qua được điều kiện thì cập nhật trạng thái
+        booking.setBookingStatus(newStatus);
+        bookingRepository.save(booking);
+
+        return ResponseEntity.ok(new ResponseObj(HttpStatus.OK.toString(),
+                "Cập nhật trạng thái booking thành công", booking));
+    }
+
+    public String setBookingStatus(){
+        var bookingList = bookingRepository.findAll();
+        for(Booking booking : bookingList){
+            if(booking.getBookingStatus() == BookingStatus.PENDING || booking.getBookingStatusPaid() == BookingStatusPaid.DEPOSIT || booking.getBookingStatusPaid() == BookingStatusPaid.PAIDALL){
+                if(booking.getLocalDate().isBefore(LocalDate.now())){
+                    booking.setBookingStatus(BookingStatus.COMPLETED);
+                    bookingRepository.save(booking);
+                }
+            }
+        }
+        return "thanh cong";
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    private void autoCancelOutdateBooking() {
+        var bookingList = bookingRepository.findAll();
+
+        for (Booking booking : bookingList) {
+            BookingStatus status = booking.getBookingStatus();
+            BookingStatusPaid paidStatus = booking.getBookingStatusPaid();
+            LocalDateTime now = LocalDateTime.now();
+
+            // TH1: Đã quá giờ kết thúc nhưng chưa Inprogress hoặc Completed => CANCELLED
+            LocalDateTime endDateTime = LocalDateTime.of(booking.getLocalDate(), booking.getEndTime());
+            if (endDateTime.isBefore(now) && status != BookingStatus.INPROGRESS && status != BookingStatus.COMPLETED) {
+                booking.setBookingStatus(BookingStatus.CANCELLED);
+                bookingRepository.save(booking);
+                System.out.println("Booking " + booking.getId() + " đã bị huỷ vì quá hạn.");
+            }
+
+            // TH2: Sắp đến ngày booking (<= 2 ngày) mà chưa thanh toán => CANCELLED
+            else if (status == BookingStatus.NOTYET && paidStatus == BookingStatusPaid.UNPAID) {
+                LocalDate bookingDate = booking.getLocalDate();
+                LocalDate today = LocalDate.now();
+
+                if (!bookingDate.isAfter(today.plusDays(2))) {
+                    booking.setBookingStatus(BookingStatus.CANCELLED);
+                    bookingRepository.save(booking);
+                    System.out.println("Booking " + booking.getId() + " đã bị huỷ vì chưa thanh toán trong vòng 2 ngày trước booking.");
+                }
+            }
         }
     }
 

@@ -32,6 +32,8 @@ public interface BookingInterfaceService {
 
     ResponseEntity<ResponseObj> getAllBookingByAdmin(HttpServletRequest request);
 
+    ResponseEntity<ResponseObj> setBookingStatus(Long bookingId, BookingStatus bookingStatus);
+
     interface RoleInterface {
         ResponseEntity<ResponseObj> createRole (RoleDTO roleDTO);
 

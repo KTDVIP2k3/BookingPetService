@@ -6,8 +6,9 @@ import lombok.Getter;
 public enum BookingStatus {
     NOTYET(0),
     PENDING(1),
-    COMPLETED(2),
-    CANCELLED(3);
+    INPROGRESS(2),
+    COMPLETED(3),
+    CANCELLED(4);
 
     private final int value;
 
