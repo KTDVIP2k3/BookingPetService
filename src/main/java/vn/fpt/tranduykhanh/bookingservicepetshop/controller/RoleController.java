@@ -38,10 +38,10 @@ public class RoleController {
 
         return roleImplement.updateRole(roleId, roleDTO);
     }
-
-    @DeleteMapping("/deletAllRole")
-    public String deleteAll(){
-        roleRepository.deleteAll();
-        return "Xoa thanh cong";
-    }
+//
+//    @DeleteMapping("/deletAllRole")
+//    public String deleteAll(){
+//        roleRepository.deleteAll();
+//        return "Xoa thanh cong";
+//    }
 }
