@@ -453,7 +453,7 @@ public class BookingImplServce implements BookingInterfaceService {
             if (currentStatus != BookingStatus.PENDING) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-                                "Chỉ booking có trạng thái PENDING mới chuyển sang INPROGRESS", null));
+                                "Chỉ booking có trạng thái đang chờ thì mới được chuyển sang trạng thái đang diễn ra", null));
             }
 
 //            if (now.isBefore(startDateTime.minusMinutes(1)) || now.isAfter(startDateTime.plusMinutes(1))) {
@@ -470,7 +470,7 @@ public class BookingImplServce implements BookingInterfaceService {
             if (currentStatus != BookingStatus.INPROGRESS) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseObj(HttpStatus.BAD_REQUEST.toString(),
-                                "Chỉ booking đang INPROGRESS mới chuyển sang COMPLETED", null));
+                                "Chỉ booking có trạng thái đang diễn ra thì mới được chuyển sang trạng thái đang hoàn thành", null));
             }
 //
 //            if (now.isBefore(endDateTime)) {
