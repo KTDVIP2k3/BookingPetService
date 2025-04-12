@@ -143,11 +143,11 @@ public class PetOptinalServiceImplement implements PetOptionalServiceServiceInte
             existingServiceOpt.get().setUpdateAt(LocalDateTime.now());
             try{
                 if(serviceImageFile == null){
-                    existingServiceOpt.get().setImageServiceBase64(null);
+//                    existingServiceOpt.get().setImageServiceBase64(null);
 
                 }else{
                     if(existingServiceOpt.get().getImageServiceBase64() == null){
-//                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
+                        existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.uploadImage(serviceImageFile));
                     }else{
                         existingServiceOpt.get().setImageServiceBase64(uploadImageFileService.updateImage(serviceImageFile, existingServiceOpt.get().getImageServiceBase64()));
                     }
