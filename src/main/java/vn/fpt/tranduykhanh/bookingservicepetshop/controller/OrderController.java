@@ -343,7 +343,7 @@ public class OrderController {
         BookingReponse bookingReponse = bookingImplServce.convertoBookingReponse(booking);
 
         for(PaymentLinkData paymentLinkData1 : booking.getPaymentLinkData()){
-            if(paymentLinkData1.getId().equalsIgnoreCase(paymentLinkData.getId())){
+            if(paymentLinkData1.getId().equalsIgnoreCase(paymentLinkDataDTO.getPaymentLinkData().getId())){
                 paymentLinkData1.setStatus(booking.getBookingStatusPaid().toString());
                 paymentLinkDataRepository.save(paymentLinkData1);
                 break;
