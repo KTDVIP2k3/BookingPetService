@@ -527,7 +527,7 @@ public class BookingImplServce implements BookingInterfaceService {
                 LocalDate bookingDate = booking.getLocalDate();
                 LocalDate today = LocalDate.now();
 
-                if (!bookingDate.isAfter(today.plusDays(2))) {
+                if (!bookingDate.isAfter(today.plusDays(1))) {
                     booking.setBookingStatus(BookingStatus.CANCELLED);
                     bookingRepository.save(booking);
                     System.out.println("Booking " + booking.getId() + " đã bị huỷ vì chưa thanh toán trong vòng 2 ngày trước booking.");
