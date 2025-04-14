@@ -27,6 +27,12 @@ public class TransactionServiceImple implements TransactionServiceInterface {
 
     @Override
     public void createTransaction(TransactionDTO transactionDTO) {
+        var transactionLists = transactionRepository.findAll();
+        for(Transaction transaction : transactionLists){
+            if(transaction.getPaymentLink().getId().equalsIgnoreCase(transactionDTO.getPaymentLinkData().getId())){
+                return;
+            }
+        }
         Transaction transaction = new Transaction();
 
         transaction.setAmount(transactionDTO.getTransaction().getAmount());
